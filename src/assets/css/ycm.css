@@ -173,3 +173,7 @@ a.desc:after {
 .grid-view .table td:last-child {
     white-space: nowrap;
 }
+
+.ycm-model-form {
+	width: 70%;
+}
