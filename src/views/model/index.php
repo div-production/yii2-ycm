@@ -8,7 +8,7 @@ use yii\helpers\Html;
 /** @var $module \janisto\ycm\Module */
 $module = Yii::$app->controller->module;
 
-$this->title = Yii::t('ycm', 'Content');
+//$this->title = Yii::t('ycm', 'Content');
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>

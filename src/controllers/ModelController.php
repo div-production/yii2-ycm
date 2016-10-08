@@ -7,7 +7,7 @@ use vova07\imperavi\helpers\FileHelper as RedactorFileHelper;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
-use yii\filters\AccessControl;
+use janisto\ycm\behaviors\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
@@ -31,7 +31,7 @@ class ModelController extends Controller
                         'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list'],
                         'allow' => true,
                         'roles' => ['@'],
-                        'matchCallback' => function () {
+                        'matchCallback' => function ($rule, $action) {
                             return in_array(Yii::$app->user->identity->username, $this->module->admins);
                         }
                     ],
@@ -46,6 +46,10 @@ class ModelController extends Controller
                     'delete' => ['get', 'post'],
                 ],
             ],
+			'reviews' => [
+				'class' => 'app\behaviors\AdminReview',
+				'name' => 'reviews'
+			]
         ];
     }
 
@@ -87,7 +91,7 @@ class ModelController extends Controller
                 throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
             }
         }
-        $file = UploadedFile::getInstanceByName('file');
+        $file = UploadedFile::getInstanceBamyName('file');
         $model = new DynamicModel(compact('file'));
         $model->addRule('file', $uploadType, $validatorOptions)->validate();
         if ($model->hasErrors()) {
@@ -178,13 +182,13 @@ class ModelController extends Controller
             'class' => 'yii\grid\ActionColumn',
             'template' => '{update} {delete}',
             'buttons' => [
-                'update' => function ($url) {
+                'update' => function ($url, $model, $key) {
                     return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
                         'title' => Yii::t('ycm', 'Update'),
                         'data-pjax' => '0',
                     ]);
                 },
-                'delete' => function ($url, $model) {
+                'delete' => function ($url, $model, $key) {
                     /** @var $module \janisto\ycm\Module */
                     $module = $this->module;
                     if ($module->getHideDelete($model) === false) {
@@ -195,13 +199,10 @@ class ModelController extends Controller
                             'data-pjax' => '0',
                         ]);
                     }
-                    return null;
                 },
             ],
-            'urlCreator' => function ($action, $model, $key) {
-                /** @var $module \janisto\ycm\Module */
-                $module = $this->module;
-                $name = $module->getModelName($model);
+            'urlCreator' => function ($action, $model, $key, $index) {
+                $name = Yii::$app->getRequest()->getQueryParam('name');
                 return Url::to([$action, 'name' => $name, 'pk' => $key]);
             }
         ]);
@@ -236,14 +237,20 @@ class ModelController extends Controller
                 'showOnEmpty' => false,
             ];
         }
+		
+		if(isset($model->viewType)) {
+			$viewType = $model->viewType;
+			$config['dataProvider']->pagination = false;
+		}
+		else $viewType = 'list';
 
-        return $this->render('list', [
+        return $this->render($viewType, [
             'config' => $config,
             'model' => $model,
             'name' => $name,
         ]);
     }
-
+	
     /**
      * Create model.
      *

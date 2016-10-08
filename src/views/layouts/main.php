@@ -12,7 +12,6 @@ use yii\widgets\Breadcrumbs;
 /** @var $module \janisto\ycm\Module */
 $module = Yii::$app->controller->module;
 
-/** @var $assetBundle \yii\web\AssetBundle */
 $assetBundle = $module->assetBundle;
 $assetBundle::register($this);
 
@@ -45,7 +44,7 @@ echo Nav::widget([
         Yii::$app->user->isGuest ?
             ['label' => Yii::t('ycm', 'Login'), 'url' => ['/site/login']] :
             ['label' => Yii::t('ycm', 'Logout ({username})', ['username' => Yii::$app->user->identity->username]),
-                'url' => ['/site/logout'],
+                'url' => '/logout/',
                 'linkOptions' => ['data-method' => 'post']],
     ],
 ]);
@@ -56,9 +55,7 @@ NavBar::end();
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
             <?php
-            $sidebarItems = ArrayHelper::merge([
-                ['label' => Yii::t('ycm', 'Content'), 'url' => ['model/index']],
-            ], $module->sidebarItems);
+            $sidebarItems = $module->sidebarItems;
 
             echo Nav::widget([
                 'options' => ['class' => 'nav nav-sidebar'],

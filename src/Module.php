@@ -16,6 +16,8 @@ use yii\helpers\Url;
 use yii\web\JsExpression;
 use yii\web\NotFoundHttpException;
 
+use app\widgets\timetable\Widget as TimetableWidget;
+
 /**
  * Main module class for yii2-ycm.
  *
@@ -62,10 +64,11 @@ class Module extends \yii\base\Module
     /** @var array The default URL rules to be used in module. */
     public $urlRules = [
         '' => 'default/index',
-        'model/<action:\w+>/<name:\w+>/<pk:\d+>' => 'model/<action>',
-        'model/<action:\w+>/<name:\w+>' => 'model/<action>',
-        'model/<action:\w+>' => 'model/<action>',
-        'download/<action:\w+>/<name:\w+>' => 'download/<action>',
+		'login' => 'login/index',
+        'model/<action:[\w-]+>/<name:\w+>/<pk:\d+>' => 'model/<action>',
+        'model/<action:[\w-]+>/<name:\w+>' => 'model/<action>',
+        'model/<action:[\w-]+>' => 'model/<action>',
+        'download/<action:[\w-]+>/<name:\w+>' => 'download/<action>',
     ];
 
     /** @var array Register models to module. */
@@ -89,10 +92,10 @@ class Module extends \yii\base\Module
     /** @var array Model upload URLs. */
     protected $modelUrls = [];
 
-    /** @var string|boolean Upload path.  */
+    /** @var string Upload path.  */
     public $uploadPath;
 
-    /** @var string|boolean Upload URL.  */
+    /** @var string Upload URL.  */
     public $uploadUrl;
 
     /** @var integer Upload permissions for folders. */
@@ -156,11 +159,16 @@ class Module extends \yii\base\Module
                 $folder = strtolower($name);
             }
             $model = Yii::createObject($class);
+			
             if (is_subclass_of($model, 'yii\db\ActiveRecord')) {
                 $this->models[$name] = $model;
                 $this->modelPaths[$name] = $this->uploadPath . DIRECTORY_SEPARATOR . $folder;
                 $this->modelUrls[$name] = $this->uploadUrl . '/' . $folder;
             }
+			
+			$viewUrl = ['model/list', 'name' => $name];
+			
+			$this->sidebarItems[] = ['label' => $this->getPluralName($model), 'url' => $viewUrl];
         }
 
         foreach ($this->registerControllers as $name => $class) {
@@ -236,6 +244,7 @@ class Module extends \yii\base\Module
     public function createWidget($form, $model, $attribute)
     {
         $widget = $this->getAttributeWidget($model, $attribute);
+		if(!$widget) return;
         $tableSchema = $model->getTableSchema();
 
         switch ($widget) {
@@ -389,9 +398,11 @@ class Module extends \yii\base\Module
                 break;
 
             case 'text':
-                $options = [
-                    'maxlength' => $tableSchema->columns[$attribute]->size,
-                ];
+                $options = [];
+				if(isset($tableSchema->columns[$attribute])) {
+					$options['maxlength'] = $tableSchema->columns[$attribute]->size;
+				}
+                
                 echo $this->createField($form, $model, $attribute, $options, 'textInput');
                 break;
 
@@ -509,7 +520,7 @@ class Module extends \yii\base\Module
                 $field->$type($items, $options);
             } elseif ($type == 'select') {
                 if (isset($options['items'])) {
-                    $options['items'] = $options['items'] + $this->getAttributeChoices($model, $attribute);;
+                    $options['items'] = $options['items'] + $this->getAttributeChoices($model, $attribute);
                 } else {
                     $options['items'] = $this->getAttributeChoices($model, $attribute);
                 }
@@ -576,6 +587,7 @@ class Module extends \yii\base\Module
                 return $this->attributeWidgets->$attribute;
             } else {
                 $tableSchema = $model->getTableSchema();
+				if(!isset($tableSchema->columns[$attribute])) return null;
                 $column = $tableSchema->columns[$attribute];
                 if ($column->phpType === 'boolean') {
                     return 'checkbox';
@@ -714,25 +726,6 @@ class Module extends \yii\base\Module
     }
 
     /**
-     * Get model property.
-     *
-     * @param string|\yii\db\ActiveRecord $model
-     * @param string $property
-     * @return mixed
-     */
-    protected function getModelProperty($model, $property)
-    {
-        if (is_string($model)) {
-            $model = $this->loadModel($model);
-        }
-        if (isset($model->$property)) {
-            return $model->$property;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Hide create model action?
      *
      * @param string|\yii\db\ActiveRecord $model
@@ -740,7 +733,14 @@ class Module extends \yii\base\Module
      */
     public function getHideCreate($model)
     {
-        return (bool) $this->getModelProperty($model, 'hideCreateAction');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideCreateAction)) {
+            return (bool) $model->hideCreateAction;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -751,7 +751,14 @@ class Module extends \yii\base\Module
      */
     public function getHideUpdate($model)
     {
-        return (bool) $this->getModelProperty($model, 'hideUpdateAction');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideUpdateAction)) {
+            return (bool) $model->hideUpdateAction;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -762,7 +769,14 @@ class Module extends \yii\base\Module
      */
     public function getHideDelete($model)
     {
-        return (bool) $this->getModelProperty($model, 'hideDeleteAction');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideDeleteAction)) {
+            return (bool) $model->hideDeleteAction;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -773,7 +787,14 @@ class Module extends \yii\base\Module
      */
     public function getDownloadCsv($model)
     {
-        return (bool) $this->getModelProperty($model, 'downloadCsv');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->downloadCsv)) {
+            return $model->downloadCsv;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -784,7 +805,14 @@ class Module extends \yii\base\Module
      */
     public function getDownloadMsCsv($model)
     {
-        return (bool) $this->getModelProperty($model, 'downloadMsCsv');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->downloadMsCsv)) {
+            return $model->downloadMsCsv;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -795,7 +823,14 @@ class Module extends \yii\base\Module
      */
     public function getDownloadExcel($model)
     {
-        return (bool) $this->getModelProperty($model, 'downloadExcel');
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->downloadExcel)) {
+            return $model->downloadExcel;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -806,10 +841,13 @@ class Module extends \yii\base\Module
      */
     public function getExcludeDownloadFields($model)
     {
-        $value = $this->getModelProperty($model, 'excludeDownloadFields');
-        if (is_array($value)) {
-            return $value;
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
         }
-        return [];
+        if (isset($model->excludeDownloadFields)) {
+            return $model->excludeDownloadFields;
+        } else {
+            return [];
+        }
     }
 }

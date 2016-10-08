@@ -19,6 +19,6 @@ abstract class Controller extends \yii\web\Controller
             ];
             return true;
         }
-        return false;
+        return true;
     }
 }

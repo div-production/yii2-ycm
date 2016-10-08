@@ -3,7 +3,7 @@
 namespace janisto\ycm\controllers;
 
 use Yii;
-use yii\filters\AccessControl;
+use janisto\ycm\behaviors\AccessControl;
 use yii\filters\VerbFilter;
 
 class DownloadController extends Controller
@@ -19,10 +19,11 @@ class DownloadController extends Controller
                         'actions' => ['csv', 'mscsv', 'excel'],
                         'allow' => true,
                         'roles' => ['@'],
-                        'matchCallback' => function () {
+                        'matchCallback' => function ($rule, $action) {
                             return in_array(Yii::$app->user->identity->username, $this->module->admins);
                         }
                     ],
+
                 ],
             ],
             'verbs' => [
