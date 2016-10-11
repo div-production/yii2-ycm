@@ -46,10 +46,6 @@ class ModelController extends Controller
                     'delete' => ['get', 'post'],
                 ],
             ],
-			'reviews' => [
-				'class' => 'app\behaviors\AdminReview',
-				'name' => 'reviews'
-			]
         ];
     }
 
