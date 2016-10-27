@@ -17,6 +17,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
+use yii\imagine\Image;
 
 class ModelController extends Controller
 {
@@ -281,7 +282,7 @@ class ModelController extends Controller
                                 }
                             }
                             $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                            if (file_exists($path) || !$file->saveAs($path, $module->uploadDeleteTempFile)) {
+                            if (file_exists($path) || !$this->saveImage($file, $path)) {
                                 throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
                             }
                             array_push($filePaths, $path);
@@ -364,7 +365,7 @@ class ModelController extends Controller
                                     }
                                 }
                                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                                if (file_exists($path) || !$file->saveAs($path, $module->uploadDeleteTempFile)) {
+                                if (file_exists($path) || !$this->saveImage($file, $path)) {
                                     throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
                                 }
                                 array_push($filePaths, $path);
@@ -425,4 +426,13 @@ class ModelController extends Controller
 
         return $this->redirect(['list', 'name' => $name]);
     }
+	
+	protected function saveImage(UploadedFile $file, $path) {
+		$module = $this->module;
+		// var_dump($file);
+		// exit;
+		Image::thumbnail($file->tempName, 1920, null)->save($path);
+		
+		return true;
+	}
 }
