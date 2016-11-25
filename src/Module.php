@@ -166,7 +166,11 @@ class Module extends \yii\base\Module
                 $this->modelUrls[$name] = $this->uploadUrl . '/' . $folder;
             }
 			
-			$viewUrl = ['model/list', 'name' => $name];
+			if (isset($model->adminUrl)) {
+				$viewUrl = $model->adminUrl;
+			} else {
+				$viewUrl = ['model/list', 'name' => $name];
+			}
 			
 			$this->sidebarItems[] = ['label' => $this->getPluralName($model), 'url' => $viewUrl];
         }

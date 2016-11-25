@@ -19,6 +19,7 @@ $this->title = Yii::t('ycm', 'Content');
         <?php
         $download = false;
         $downloadItems = [];
+		$model = $module->loadModel($name);
         if ($module->getDownloadCsv($name)) {
             $download = true;
             array_push($downloadItems, [
@@ -43,8 +44,15 @@ $this->title = Yii::t('ycm', 'Content');
         ?>
 
         <h3><?= $module->getAdminName($name) ?></h3>
-
-        <?= Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), ['model/list', 'name' => $name], ['class' => 'btn btn-primary']) ?>
+	
+		<?php
+        if (isset($model->adminUrl)) {
+            $viewUrl = $model->adminUrl;
+        } else {
+            $viewUrl = ['model/list', 'name' => $name];
+        }
+        echo Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), $viewUrl, ['class' => 'btn btn-primary']);
+        ?>
 
         <?php
         if ($module->getHideCreate($name) === false) {
