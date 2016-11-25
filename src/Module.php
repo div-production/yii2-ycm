@@ -746,6 +746,23 @@ class Module extends \yii\base\Module
             return false;
         }
     }
+	
+	/**
+     * Hide OK model action?
+     *
+     * @param string|\yii\db\ActiveRecord $model
+     * @return bool
+     */
+	public function getHideOk($model) {
+		if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideOkAction)) {
+            return (bool) $model->hideOkAction;
+        } else {
+            return false;
+        }
+	}
 
     /**
      * Hide update model action?

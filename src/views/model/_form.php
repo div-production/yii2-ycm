@@ -44,8 +44,10 @@ $attributes = array_filter(array_unique(array_map('trim', $attributes)));
             // Save disabled. Add a note?
         else:
             ?>
-
-            <?= Html::submitButton(Yii::t('ycm', 'Save'), ['name' => '_save', 'value' => '1', 'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+			
+			<? if ($module->getHideOk($model) === false): ?>
+				<?= Html::submitButton(Yii::t('ycm', 'Save'), ['name' => '_save', 'value' => '1', 'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+			<? endif ?>
 			
 			<? if ($module->getHideCreate($model) === false): ?>
 				<?= Html::submitButton(Yii::t('ycm', 'Save and add another'), ['name' => '_addanother', 'value' => '1', 'class' => 'btn btn-default']) ?>
