@@ -282,7 +282,7 @@ class ModelController extends Controller
                                 }
                             }
                             $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                            if (file_exists($path) || !$this->saveImage($file, $path)) {
+                            if (file_exists($path) || !$this->saveFile($file, $path)) {
                                 throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
                             }
                             array_push($filePaths, $path);
@@ -365,7 +365,7 @@ class ModelController extends Controller
                                     }
                                 }
                                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                                if (file_exists($path) || !$this->saveImage($file, $path)) {
+                                if (file_exists($path) || !$this->saveFile($file, $path)) {
                                     throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
                                 }
                                 array_push($filePaths, $path);
@@ -427,11 +427,14 @@ class ModelController extends Controller
         return $this->redirect(['list', 'name' => $name]);
     }
 	
-	protected function saveImage(UploadedFile $file, $path) {
+	protected function saveFile(UploadedFile $file, $path) {
 		$module = $this->module;
-		// var_dump($file);
-		// exit;
-		Image::thumbnail($file->tempName, 1920, null)->save($path);
+		
+		if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml') {
+			Image::thumbnail($file->tempName, 1920, null)->save($path);
+		} else {
+			$file->saveAs($path);
+		}
 		
 		return true;
 	}
