@@ -88,7 +88,7 @@ class ModelController extends Controller
                 throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
             }
         }
-        $file = UploadedFile::getInstanceBamyName('file');
+        $file = UploadedFile::getInstanceByName('file');
         $model = new DynamicModel(compact('file'));
         $model->addRule('file', $uploadType, $validatorOptions)->validate();
         if ($model->hasErrors()) {
