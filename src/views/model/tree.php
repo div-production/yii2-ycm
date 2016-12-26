@@ -1,5 +1,4 @@
 <?php
-use leandrogehlen\treegrid\TreeGrid;
 use yii\helpers\Url;
 use yii\helpers\Html;
 
@@ -22,25 +21,4 @@ $this->params['breadcrumbs'][] = $this->title;
 	}
 	?>
 </p>
-<?= TreeGrid::widget([
-    'dataProvider' => $config['dataProvider'],
-    'keyColumnName' => 'id',
-    'parentColumnName' => 'parent_id',
-    'pluginOptions' => [
-        'initialState' => 'collapsed',
-    ],
-    'columns' => [
-        'name',
-        'id',
-        'parent_id',
-        [
-			'class' => 'yii\grid\ActionColumn',
-			'template' => '{update} {delete}',
-			'urlCreator' => function ($action, $model, $key, $index) {
-                $name = Yii::$app->getRequest()->getQueryParam('name');
-                return Url::to(['model/'.$action, 'name' => 'catalog', 'pk' => $key]);
-            }
-		],
-		
-    ]
-]) ?>
+<?= $this->render('_tree', ['model' => $model]) ?>

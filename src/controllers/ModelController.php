@@ -18,6 +18,7 @@ use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 use yii\imagine\Image;
+use janisto\ycm\widgets\TreeGrid\Widget as TreeGrid;
 
 class ModelController extends Controller
 {
@@ -29,7 +30,7 @@ class ModelController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list'],
+                        'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list', 'get-tree'],
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
@@ -425,6 +426,16 @@ class ModelController extends Controller
         }
 
         return $this->redirect(['list', 'name' => $name]);
+    }
+    
+    public function actionGetTree() {
+        if($model = Yii::$app->request->post('model')) {
+            $model = new $model;
+        }
+        else {
+            return false;
+        }
+        return $this->renderPartial('_tree', ['model' => $model]);
     }
 	
 	protected function saveFile(UploadedFile $file, $path) {
