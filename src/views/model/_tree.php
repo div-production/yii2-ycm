@@ -20,7 +20,6 @@ $config = [
 			'class' => 'yii\grid\ActionColumn',
 			'template' => '{update} {delete}',
 			'urlCreator' => function ($action, $model, $key, $index) use ($name) {
-                $name = Yii::$app->getRequest()->getQueryParam('name');
                 return Url::to(['model/'.$action, 'name' => $name, 'pk' => $key]);
             }
 		],
