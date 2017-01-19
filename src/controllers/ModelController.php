@@ -161,6 +161,8 @@ class ModelController extends Controller
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name);
 
+        Yii::$app->session['last_list_url'] = Yii::$app->request->url;
+
         $columns = [];
         if (method_exists($model, 'gridViewColumns')) {
             $columns = $model->gridViewColumns();
@@ -385,7 +387,11 @@ class ModelController extends Controller
                 } elseif (Yii::$app->request->post('_continue')) {
                     return $this->redirect(['update', 'name' => $name, 'pk' => $model->primaryKey]);
                 } else {
-                    return $this->redirect(['list', 'name' => $name]);
+                    if (isset(Yii::$app->session['last_list_url'])) {
+                        return $this->redirect(Yii::$app->session['last_list_url']);
+                    } else {
+                        return $this->redirect(['list', 'name' => $name]);
+                    }
                 }
             } elseif (count($filePaths) > 0) {
                 foreach ($filePaths as $path) {
