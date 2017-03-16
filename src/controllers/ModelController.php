@@ -217,7 +217,7 @@ class ModelController extends Controller
                 'dataProvider' => $dataProvider,
                 'filterModel' => $model,
                 'columns' => $columns,
-                'showOnEmpty' => false,
+                'showOnEmpty' => true,
             ];
         } else {
             $sort = [];
