@@ -157,6 +157,8 @@ class Widget extends BaseWidget {
     
     public $model;
     
+    public $enableMultiRoot = false;
+    
     public function init()
     {
         if ($this->dataProvider === null) {
@@ -431,7 +433,9 @@ class Widget extends BaseWidget {
         foreach ($data as $key => $element) {
             if ($element[$this->parentColumnName] == $parentId) {
                 $result[] = $element;
-                unset($data[$key]);
+                if (!$this->enableMultiRoot) {
+                    unset($data[$key]);
+                }
                 $children = $this->normalizeData($data, $element[$this->keyColumnName]);
                 if ($children) {
                     $result = array_merge($result, $children);
