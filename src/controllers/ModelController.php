@@ -448,7 +448,9 @@ class ModelController extends Controller
 		$module = $this->module;
 		
 		if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml') {
-			Image::thumbnail($file->tempName, 1920, null)->save($path);
+			Image::thumbnail($file->tempName, 1900, null)->save($path, [
+				'quality' => 70,
+			]);
 		} else {
 			$file->saveAs($path);
 		}
