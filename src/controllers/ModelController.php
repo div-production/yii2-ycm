@@ -161,6 +161,11 @@ class ModelController extends Controller
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name);
 
+        $scenarios = $model->scenarios();
+        if (isset($scenarios['list'])) {
+            $model->scenario = 'list';
+        }
+
         Yii::$app->session['last_list_url'] = Yii::$app->request->url;
 
         $columns = [];
@@ -244,6 +249,8 @@ class ModelController extends Controller
 		}
 		else $viewType = 'list';
 
+        $model->scenario = 'list';
+
         return $this->render($viewType, [
             'config' => $config,
             'model' => $model,
@@ -266,6 +273,11 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name);
+
+        $scenarios = $model->scenarios();
+        if (isset($scenarios['create'])) {
+            $model->scenario = 'create';
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             $filePaths = [];
@@ -315,6 +327,8 @@ class ModelController extends Controller
             }
         }
 
+        $model->scenario = 'create';
+
         return $this->render('create', [
             'model' => $model,
             'name' => $name,
@@ -337,6 +351,11 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
+
+        $scenarios = $model->scenarios();
+        if (isset($scenarios['update'])) {
+            $model->scenario = 'update';
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             $filePaths = [];
@@ -405,6 +424,8 @@ class ModelController extends Controller
             }
         }
 
+        $model->scenario = 'update';
+
         return $this->render('update', [
             'model' => $model,
             'name' => $name,
@@ -424,6 +445,11 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
+        
+        $scenarios = $model->scenarios();
+        if (isset($scenarios['delete'])) {
+            $model->scenario = 'delete';
+        }
 
         if ($model->delete() !== false) {
             Yii::$app->session->setFlash('success', Yii::t('ycm', '{name} has been deleted.', ['name' => $module->getSingularName($name)]));
