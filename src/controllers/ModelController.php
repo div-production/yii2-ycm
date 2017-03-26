@@ -13,6 +13,7 @@ use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
+use yii\validators\BooleanValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
@@ -173,9 +174,34 @@ class ModelController extends Controller
             $columns = $model->gridViewColumns();
         } else {
             //$columns = $model->getTableSchema()->getColumnNames();
+
+            $validators = [
+                'boolean' => [],
+            ];
+
+            foreach ($model->validators as $validator) {
+                if ($validator instanceof BooleanValidator) {
+                    $validators['boolean'] += $validator->attributes;
+                }
+            }
+
             $i = 0;
             foreach ($model->getTableSchema()->columns as $column) {
-                $columns[] = $column->name;
+                if (in_array($column->name, $validators['boolean'])) {
+                    $columns[] = [
+                        'attribute' => $column->name,
+                        'content' => function ($model) {
+                            return $model->active ? 'Да' : 'Нет';
+                        },
+                        'filter' => [
+                            1 => 'Да',
+                            0 => 'Нет',
+                        ],
+                    ];
+                } else {
+                    $columns[] = $column->name;
+                }
+
                 $i++;
                 if ($i === $module->maxColumns) {
                     break;
