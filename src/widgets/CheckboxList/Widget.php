@@ -66,7 +66,7 @@ class Widget extends BaseWidget
         $name = Html::getInputName($this->model, $this->attribute);
 
         $columnsCount = min(max($this->columnsCount, 1), 10);
-        $countInColumn = ceil(count($values) / $columnsCount);
+        $countInColumn = max(ceil(count($values) / $columnsCount), 1);
         $columns = array_chunk($values, $countInColumn);
 
         $result = '';
