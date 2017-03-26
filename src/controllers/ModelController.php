@@ -185,8 +185,8 @@ class ModelController extends Controller
                 if (in_array($column->name, $validators['boolean'])) {
                     $columns[] = [
                         'attribute' => $column->name,
-                        'content' => function ($model) {
-                            return $model->active ? 'Да' : 'Нет';
+                        'content' => function ($model, $key, $index, $column) {
+                            return $model->{$column->attribute} ? 'Да' : 'Нет';
                         },
                         'filter' => [
                             1 => 'Да',
