@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use janisto\ycm\widgets\Alert;
+use janisto\ycm\widgets\SortableGrid\Widget as SortableGrid;
 
 /* @var $this \yii\web\View */
 /* @var $config array */
@@ -15,7 +16,6 @@ $module = Yii::$app->controller->module;
 $this->title = $module->getAdminName($model);
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('ycm', 'Content'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 
 <div class="ycm-model-list">
@@ -36,7 +36,13 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
     </p>
-
-    <?= GridView::widget($config); ?>
-
+	<?php if (!empty($model->enableAdminSort)): ?>
+		<?php
+		$config['sortableAction'] = ['sort'];
+		$config['model'] = $model;
+		?>
+		<?= SortableGrid::widget($config); ?>
+	<?php else: ?>
+		<?= GridView::widget($config) ?>
+	<?php endif ?>
 </div>

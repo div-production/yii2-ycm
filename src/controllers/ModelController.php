@@ -20,6 +20,8 @@ use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 use yii\imagine\Image;
 use janisto\ycm\widgets\TreeGrid\Widget as TreeGrid;
+use janisto\ycm\widgets\SortableGrid\SortableGridAction;
+use yii\data\Sort;
 
 class ModelController extends Controller
 {
@@ -31,7 +33,7 @@ class ModelController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list', 'get-tree'],
+                        'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list', 'get-tree', 'sort'],
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
@@ -47,10 +49,20 @@ class ModelController extends Controller
                     'redactor-upload' => ['post'],
                     'redactor-list' => ['get'],
                     'delete' => ['get', 'post'],
+                    'sort' => ['get', 'post'],
                 ],
             ],
         ];
     }
+	
+	public function actions()
+	{
+		return [
+			'sort' => [
+				'class' => SortableGridAction::className(),
+			],
+		];
+	}
 
     /**
      * Default action.
@@ -250,6 +262,7 @@ class ModelController extends Controller
             if (method_exists($model, 'gridViewSort')) {
                 $sort = $model->gridViewSort();
             }
+
             $dataProvider = new ActiveDataProvider([
                 'query' => $model->find(),
                 'sort' => $sort,
