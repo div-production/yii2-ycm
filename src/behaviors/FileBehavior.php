@@ -94,4 +94,9 @@ class FileBehavior extends Behavior
         }
         return false;
     }
+	
+	public function getSavePath($attribute)
+	{
+		return $this->uploadPath . DIRECTORY_SEPARATOR . strtolower($this->folderName) . DIRECTORY_SEPARATOR . strtolower($attribute);
+	}
 }
