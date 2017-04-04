@@ -25,7 +25,8 @@ class FileBehavior extends Behavior
         parent::init();
 
         if ($this->folderName === null) {
-            throw new InvalidConfigException('You must define "folderName".');
+			$module = Yii::$app->getModule('ycm');
+            $this->folderName = $module->getModelName($this->owner);
         }
 
         if ($this->uploadPath === null) {
