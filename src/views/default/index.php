@@ -41,6 +41,13 @@ $this->title = Yii::t('ycm', 'Content');
                 'url' => ['download/excel', 'name' => $name],
             ]);
         }
+		if ($module->getDownloadExcelNew($name)) {
+            $download = true;
+            array_push($downloadItems, [
+                'label' => Yii::t('ycm', 'Excel'),
+                'url' => ['download/excel-new', 'name' => $name],
+            ]);
+        }
         ?>
 
         <h3><?= $module->getAdminName($name) ?></h3>

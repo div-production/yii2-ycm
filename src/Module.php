@@ -853,6 +853,24 @@ class Module extends \yii\base\Module
             return false;
         }
     }
+	
+	/**
+     * Download Excel in new format?
+     *
+     * @param string|\yii\db\ActiveRecord $model
+     * @return bool
+     */
+	public function getDownloadExcelNew($model)
+    {
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->downloadExcelNew)) {
+            return $model->downloadExcelNew;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Get excluded download fields.

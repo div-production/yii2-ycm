@@ -5,6 +5,8 @@ namespace janisto\ycm\controllers;
 use Yii;
 use janisto\ycm\behaviors\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
+use yii\web\Response;
 
 class DownloadController extends Controller
 {
@@ -16,7 +18,7 @@ class DownloadController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['csv', 'mscsv', 'excel'],
+                        'actions' => ['csv', 'mscsv', 'excel', 'excel-new'],
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
@@ -242,4 +244,69 @@ class DownloadController extends Controller
         Yii::$app->response->sendContentAsFile($content, $filename, $options);
         Yii::$app->end();
     }
+	
+	public function actionExcelNew($name)
+	{
+		if (!class_exists('PHPExcel')) {
+			throw new \Exception('You need to install phpoffice/phpexcel');
+		}
+		
+		/** @var $module \janisto\ycm\Module */
+        $module = $this->module;
+        /** @var $model \yii\db\ActiveRecord */
+        $model = $module->loadModel($name);
+		
+		$xls = new \PHPExcel();
+		$xls->setActiveSheetIndex(0);
+		$sheet = $xls->getActiveSheet();
+		
+		if (method_exists($model, 'getExcelColumns')) {
+			$columns = $model->getExcelColumns();
+		} else {
+			$columns = ArrayHelper::getColumn($model->tableSchema->columns, 'name');
+		}
+		
+		$rows = $model->find()->all();
+		
+		array_unshift($rows, []);
+		
+		$rowId = 1;
+		foreach ($rows as $row) {
+			$colId = 0;
+			foreach ($columns as $key => $col) {
+				if (is_int($key)) {
+					$attribute = $col;
+				} else {
+					$attribute = $key;
+				}
+				
+				$cell = $sheet->getCellByColumnAndRow($colId, $rowId);
+				if ($rowId == 1) {
+					$cell->setValue($model->getAttributeLabel($attribute));
+					$sheet->getStyle($cell->getCoordinate())->getFont()->setBold(true);
+					
+					$colLetter = \PHPExcel_Cell::stringFromColumnIndex($colId);
+					
+					$sheet->getColumnDimension($colLetter)->setAutoSize(true);
+				} else {
+					if ($col instanceof \Closure) {
+						$value = call_user_func($col, $row, $attribute);
+					} else {
+						$value = $row->$col;
+					}
+					$cell->setValue($value);
+				}
+				$colId++;
+			}
+			$rowId++;
+		}
+		
+		Yii::$app->response->format = Response::FORMAT_RAW;
+	
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename=export-'.date('d-m-Y').'.xls');
+
+		$objWriter = new \PHPExcel_Writer_Excel5($xls);
+		$objWriter->save('php://output');
+	}
 }
