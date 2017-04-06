@@ -281,9 +281,10 @@ class DownloadController extends Controller
 				}
 				
 				$cell = $sheet->getCellByColumnAndRow($colId, $rowId);
+				$style = $sheet->getStyle($cell->getCoordinate());
 				if ($rowId == 1) {
 					$cell->setValue($model->getAttributeLabel($attribute));
-					$sheet->getStyle($cell->getCoordinate())->getFont()->setBold(true);
+					$style->getFont()->setBold(true);
 					
 					$colLetter = \PHPExcel_Cell::stringFromColumnIndex($colId);
 					
@@ -294,7 +295,21 @@ class DownloadController extends Controller
 					} else {
 						$value = $row->$col;
 					}
-					$cell->setValue($value);
+					if ($value instanceof \PHPExcel_Cell_Hyperlink) {
+						$cell->setHyperlink($value);
+						$anchor = $value->getTooltip();
+						if (!$anchor) {
+							$anchor = 'Перейти';
+						}
+						$cell->setValue($anchor);
+						$style
+							->getFont()
+							->setUnderline(true)
+							->setColor(new \PHPExcel_Style_Color(\PHPExcel_Style_Color::COLOR_BLUE));
+					} else {
+						$cell->setValue($value);
+					}
+					
 				}
 				$colId++;
 			}
