@@ -288,10 +288,20 @@ class DownloadController extends Controller
 					
 					$colLetter = \PHPExcel_Cell::stringFromColumnIndex($colId);
 					
-					$sheet->getColumnDimension($colLetter)->setAutoSize(true);
+					if (is_array($col) && isset($col['width'])) {
+						$sheet->getColumnDimension($colLetter)->setWidth($col['width']);
+					} else {
+						$sheet->getColumnDimension($colLetter)->setAutoSize(true);
+					}
 				} else {
 					if ($col instanceof \Closure) {
 						$value = call_user_func($col, $row, $attribute);
+					} elseif (is_array($col)) {
+						if (isset($col['content'])) {
+							$value = call_user_func($col['content'], $row, $attribute);
+						} else {
+							$value = $row->$key;
+						}
 					} else {
 						$value = $row->$col;
 					}
