@@ -221,10 +221,15 @@ class ModelController extends Controller
             'template' => '{update} {delete}',
             'buttons' => [
                 'update' => function ($url, $model, $key) {
-                    return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
-                        'title' => Yii::t('ycm', 'Update'),
-                        'data-pjax' => '0',
-                    ]);
+                    /** @var $module \janisto\ycm\Module */
+                    $module = $this->module;
+                    if ($module->getHideEdit($model) === false) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                            'title' => Yii::t('ycm', 'Update'),
+                            'data-pjax' => '0',
+                        ]);
+                    }
+
                 },
                 'delete' => function ($url, $model, $key) {
                     /** @var $module \janisto\ycm\Module */

@@ -783,6 +783,24 @@ class Module extends \yii\base\Module
     }
 
     /**
+     * Hide edit model action?
+     *
+     * @param string|\yii\db\ActiveRecord $model
+     * @return bool
+     */
+    public function getHideEdit($model)
+    {
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideEditAction)) {
+            return (bool) $model->hideEditAction;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Hide delete model action?
      *
      * @param string|\yii\db\ActiveRecord $model
