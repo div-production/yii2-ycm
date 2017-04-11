@@ -20,4 +20,10 @@ class LoginController extends Controller {
             'model' => $model,
         ]);
 	}
+	
+	public function actionLogout()
+	{
+		Yii::$app->user->logout();
+        return $this->goHome();
+	}
 }

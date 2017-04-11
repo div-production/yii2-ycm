@@ -65,6 +65,7 @@ class Module extends \yii\base\Module
     public $urlRules = [
         '' => 'default/index',
 		'login' => 'login/index',
+		'logout' => 'login/logout',
         'model/<action:[\w-]+>/<name:\w+>/<pk:\d+>' => 'model/<action>',
         'model/<action:[\w-]+>/<name:\w+>' => 'model/<action>',
         'model/<action:[\w-]+>' => 'model/<action>',
