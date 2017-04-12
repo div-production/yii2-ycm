@@ -504,6 +504,6 @@ class ModelController extends Controller
 	
 	public function redirect($url, $statusCode = 302)
     {
-        return Yii::$app->getResponse()->redirect($url, $statusCode, false);
+        return Yii::$app->getResponse()->redirect(Url::to($url), $statusCode, false);
     }
 }
