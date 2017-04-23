@@ -20,7 +20,20 @@ class DataAttribute extends Object {
 		$model = $this->model;
 		if(is_array($model->{$this->attribute})) {
 			$data = $model->{$this->attribute};
-			$result = Widget::reBuild($data);
+			$result = [];
+			foreach (Widget::reBuild($data) as $key => $item) {
+			    $isEmpty = true;
+			    foreach ($item as $value) {
+                    if (trim($value)) {
+                        $isEmpty = false;
+                    }
+                }
+
+                if (!$isEmpty) {
+			        $result[$key] = $item;
+                }
+            }
+
 			$model->{$this->attribute} = serialize($result);
 		}
 		else $model->{$this->attribute} = '';
