@@ -491,7 +491,7 @@ class ModelController extends Controller
 	protected function saveFile(UploadedFile $file, $path) {
 		$module = $this->module;
 		
-		if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml') {
+		if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
 			Image::thumbnail($file->tempName, 1900, null)->save($path, [
 				'quality' => 70,
 			]);
