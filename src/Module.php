@@ -908,4 +908,14 @@ class Module extends \yii\base\Module
             return [];
         }
     }
+
+	public function isDemo()
+    {
+        $demo = getenv('YII_DEMO');
+        if ($demo == 'true' || $demo === true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

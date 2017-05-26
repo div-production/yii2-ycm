@@ -44,4 +44,7 @@ return [
     '{name} has been created.' => 'Запись <b>{name}</b> создана.',
     '{name} has been deleted.' => 'Запись <b>{name}</b> удалена.',
     '{name} has been updated.' => 'Запись <b>{name}</b> обновлена.',
+	'You can\'t create entries in demo mode' => 'Вы не можете создавать записи в демо режиме',
+	'You can\'t edit entries in demo mode' => 'Вы не можете редактировать записи в демо режиме',
+	'You can\'t delete entries in demo mode' => 'Вы не можете удалять записи в демо режиме',
 ];

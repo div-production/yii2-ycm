@@ -310,8 +310,10 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name);
+		
+		$demo = $module->isDemo();
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && !$demo) {
             $filePaths = [];
             foreach ($model->tableSchema->columns as $column) {
                 $attribute = $column->name;
@@ -357,6 +359,8 @@ class ModelController extends Controller
                     }
                 }
             }
+        } elseif (Yii::$app->request->method == 'POST' && $demo) {
+            Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t create entries in demo mode'));
         }
 
         return $this->render('create', [
@@ -381,8 +385,10 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
-
-        if ($model->load(Yii::$app->request->post())) {
+		
+		$demo = $module->isDemo();
+		
+        if ($model->load(Yii::$app->request->post()) && !$demo) {
             $filePaths = [];
             foreach ($model->tableSchema->columns as $column) {
                 $attribute = $column->name;
@@ -447,6 +453,8 @@ class ModelController extends Controller
                     }
                 }
             }
+		} elseif (Yii::$app->request->method == 'POST' && $demo) {
+            Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t edit entries in demo mode'));
         }
 
         return $this->render('update', [
@@ -469,7 +477,9 @@ class ModelController extends Controller
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
 
-        if ($model->delete() !== false) {
+		if ($module->isDemo()) {
+			Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t delete entries in demo mode'));
+		} elseif ($model->delete() !== false) {
             Yii::$app->session->setFlash('success', Yii::t('ycm', '{name} has been deleted.', ['name' => $module->getSingularName($name)]));
         } else {
             Yii::$app->session->setFlash('error', Yii::t('ycm', 'Could not delete {name}.', ['name' => $module->getSingularName($name)]));
