@@ -12,8 +12,14 @@ class DataAttribute extends Object {
 	
 	public function getList() {
 		$data = $this->model->{$this->attribute};
-		if($data) return unserialize($data);
-		else return [];
+		
+		if (is_array($data)) {
+		    return $data;
+        } elseif(is_string($data)) {
+		    return unserialize($data);
+        } else {
+		    return [];
+        }
 	}
 	
 	public function save() {
