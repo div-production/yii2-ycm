@@ -15,6 +15,7 @@ use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\web\JsExpression;
 use yii\web\NotFoundHttpException;
+use yii\bootstrap\Tabs;
 
 use app\widgets\timetable\Widget as TimetableWidget;
 
@@ -254,8 +255,7 @@ class Module extends \yii\base\Module
 
         switch ($widget) {
             case 'widget':
-                echo $this->createField($form, $model, $attribute, [], 'widget');
-                break;
+                return $this->createField($form, $model, $attribute, [], 'widget');
 
             case 'wysiwyg':
                 $options = [
@@ -294,8 +294,7 @@ class Module extends \yii\base\Module
                     ];
                     $options = ArrayHelper::merge($options, $fileOptions);
                 }
-                echo $this->createField($form, $model, $attribute, $options, 'widget');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'date':
                 $options = [
@@ -305,8 +304,7 @@ class Module extends \yii\base\Module
                         'dateFormat' => 'yy-mm-dd',
                     ],
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'widget');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'time':
                 $options = [
@@ -317,8 +315,7 @@ class Module extends \yii\base\Module
                         'showSecond' => true,
                     ],
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'widget');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'datetime':
                 $options = [
@@ -330,8 +327,7 @@ class Module extends \yii\base\Module
                         'showSecond' => true,
                     ],
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'widget');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'select':
                 $options = [
@@ -346,8 +342,7 @@ class Module extends \yii\base\Module
                         '' => '', // Add empty item for placeholder
                     ],
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'select');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'select');
 
             case 'selectMultiple':
                 $options = [
@@ -359,8 +354,7 @@ class Module extends \yii\base\Module
                         'width' => '100%',
                     ],
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'select');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'select');
 
             case 'image':
                 $options = [];
@@ -383,8 +377,7 @@ class Module extends \yii\base\Module
                     $html = ob_get_clean();
                     $options['hint'] = $html;
                 }
-                echo $this->createField($form, $model, $attribute, $options, 'fileInput');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'fileInput');
 
             case 'file':
                 $options = [];
@@ -399,8 +392,7 @@ class Module extends \yii\base\Module
                     $html .= Html::a(Yii::t('ycm', 'Download file'), $url, ['class'=>'btn btn-info btn-sm']);
                     $options['hint'] = $html;
                 }
-                echo $this->createField($form, $model, $attribute, $options, 'fileInput');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'fileInput');
 
             case 'text':
                 $options = [];
@@ -408,77 +400,65 @@ class Module extends \yii\base\Module
 					$options['maxlength'] = $tableSchema->columns[$attribute]->size;
 				}
                 
-                echo $this->createField($form, $model, $attribute, $options, 'textInput');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'textInput');
 
             case 'hidden':
                 $options = [
                     'maxlength' => $tableSchema->columns[$attribute]->size,
                 ];
                 $options = $this->getAttributeOptions($attribute, $options);
-                echo Html::activeHiddenInput($model, $attribute, $options);
-                break;
+                return Html::activeHiddenInput($model, $attribute, $options);
 
             case 'password':
                 $options = [
                     'maxlength' => $tableSchema->columns[$attribute]->size,
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'passwordInput');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'passwordInput');
 
             case 'textarea':
                 $options = [
                     'rows' => 6,
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'textarea');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'textarea');
 
             case 'radio':
-                echo $this->createField($form, $model, $attribute, [], 'radio');
-                break;
+                return $this->createField($form, $model, $attribute, [], 'radio');
 
             case 'boolean':
             case 'checkbox':
-                echo $this->createField($form, $model, $attribute, [], 'checkbox');
-                break;
+                return $this->createField($form, $model, $attribute, [], 'checkbox');
 
             case 'dropdown':
                 $options = [
                     'prompt' => Yii::t('ycm', 'Choose {name}', ['name' => $model->getAttributeLabel($attribute)]),
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'dropDownList');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'dropDownList');
 
             case 'listbox':
                 $options = [
                     'prompt' => '',
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'listBox');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'listBox');
 
             case 'checkboxList':
-                echo $this->createField($form, $model, $attribute, [], 'checkboxList');
-                break;
+                return $this->createField($form, $model, $attribute, [], 'checkboxList');
 
             case 'radioList':
-                echo $this->createField($form, $model, $attribute, [], 'radioList');
-                break;
+                return $this->createField($form, $model, $attribute, [], 'radioList');
 
             case 'disabled':
                 $options = [
                     'maxlength' => $tableSchema->columns[$attribute]->size,
                     'readonly' => true,
                 ];
-                echo $this->createField($form, $model, $attribute, $options, 'textInput');
-                break;
+                return $this->createField($form, $model, $attribute, $options, 'textInput');
 
             case 'hide':
-                break;
+                return;
 
             default:
                 $options = $this->getAttributeOptions($attribute);
-                echo $form->field($model, $attribute)->$widget($options);
-                break;
+                return $form->field($model, $attribute)->$widget($options);
         }
     }
 
@@ -918,4 +898,45 @@ class Module extends \yii\base\Module
             return false;
         }
     }
+	
+	public function createTabs($form, $model, $attributes)
+	{
+		if (method_exists($model, 'attributeTabs')) {
+			$attributeTabs = $model->attributeTabs();
+			$tabs = [
+				[
+					'label' => 'Основное',
+					'content' => '<br>',
+					'active' => true,
+				],
+			];
+			foreach ($attributeTabs as $tabConfig) {
+				$tab = [
+					'label' => $tabConfig['label'],
+					'content' => '<br>',
+				];
+				foreach ($tabConfig['fields'] as $field) {
+					$tab['content'] .= $this->createWidget($form, $model, $field);
+					$attrKey = array_search($field, $attributes);
+					if ($attrKey !== false) {
+						unset($attributes[$attrKey]);
+					}
+				}
+				$tabs[] = $tab;
+			}
+			foreach ($attributes as $attr) {
+				$tabs[0]['content'] .= $this->createWidget($form, $model, $attr);
+			}
+			
+			return Tabs::widget([
+				'items' => $tabs,
+			]);
+		} else {
+			$result = '';
+			foreach ($attributes as $attribute) {
+				$result .= $this->createWidget($form, $model, $attribute);
+			}
+			return $result;
+		}
+	}
 }

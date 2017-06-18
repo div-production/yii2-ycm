@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use janisto\ycm\widgets\Alert;
+use yii\bootstrap\Tabs;
 
 /* @var $this \yii\web\View */
 /* @var $model \yii\db\ActiveRecord */
@@ -30,11 +31,7 @@ $attributes = array_filter(array_unique(array_map('trim', $attributes)));
 
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
 
-    <?php
-    foreach ($attributes as $attribute) {
-        $module->createWidget($form, $model, $attribute);
-    }
-    ?>
+    <?= $module->createTabs($form, $model, $attributes) ?>
 
     <div class="form-group">
 
