@@ -4,7 +4,7 @@ namespace janisto\ycm;
 
 use Yii;
 use janisto\timepicker\TimePicker;
-use mihaildev\ckeditor\CKEditor;
+use dosamigos\ckeditor\CKEditor;
 use vova07\select2\Widget as Select2Widget;
 use yii\base\InvalidConfigException;
 use yii\bootstrap\Modal;
@@ -258,9 +258,11 @@ class Module extends \yii\base\Module
                 return $this->createField($form, $model, $attribute, [], 'widget');
 
             case 'wysiwyg':
+				$imageUploaderUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/js/cke.image-uploader.js';
+				Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
                 $options = [
                     'widgetClass' => CKEditor::className(),
-                    'editorOptions' => [
+                    'clientOptions' => [
 						'inline' => false,
 						'toolbar' => [
 							['name' => 'document', 'items' => ['Source']],
@@ -274,7 +276,8 @@ class Module extends \yii\base\Module
 							['name' => 'tools', 'items' => ['ShowBlocks']],
 							['name' => 'about', 'items' => ['About']],
 						],
-						'uploadUrl' => '/sdvsdv'
+						'extraPlugins' => 'imageUploader,filetools',
+						'uploadUrl' => Url::to(['model/redactor-upload', 'name' => $this->getModelName($model), 'attr' => $attribute]),
 					],
                 ];
                 /*if ($this->redactorImageUpload === true) {

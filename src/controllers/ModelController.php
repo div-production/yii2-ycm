@@ -25,6 +25,8 @@ use yii\data\Sort;
 
 class ModelController extends Controller
 {
+	public $enableCsrfValidation = false;
+
     /** @inheritdoc */
     public function behaviors()
     {
@@ -102,7 +104,7 @@ class ModelController extends Controller
                 throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
             }
         }
-        $file = UploadedFile::getInstanceByName('file');
+        $file = UploadedFile::getInstanceByName('upload');
         $model = new DynamicModel(compact('file'));
         $model->addRule('file', $uploadType, $validatorOptions)->validate();
         if ($model->hasErrors()) {
@@ -115,10 +117,9 @@ class ModelController extends Controller
             }
             $path = $attributePath . DIRECTORY_SEPARATOR . $model->file->name;
             if ($model->file->saveAs($path)) {
-                $result = ['filelink' => $module->getAttributeUrl($name, $attribute, $model->file->name)];
-                if ($uploadType == 'file') {
-                    $result['filename'] = $model->file->name;
-                }
+                $result = ['url' => $module->getAttributeUrl($name, $attribute, $model->file->name)];
+                    $result['fileName'] = $model->file->name;
+					$result['uploaded'] = 1;
             } else {
                 $result = [
                     'error' => Yii::t('ycm', 'Could not upload file.'),
