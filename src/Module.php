@@ -4,7 +4,7 @@ namespace janisto\ycm;
 
 use Yii;
 use janisto\timepicker\TimePicker;
-use vova07\imperavi\Widget as RedactorWidget;
+use mihaildev\ckeditor\CKEditor;
 use vova07\select2\Widget as Select2Widget;
 use yii\base\InvalidConfigException;
 use yii\bootstrap\Modal;
@@ -259,16 +259,25 @@ class Module extends \yii\base\Module
 
             case 'wysiwyg':
                 $options = [
-                    'widgetClass' => RedactorWidget::className(),
-                    'settings' => [
-                        'minHeight' => 200,
-                        'plugins' => [
-                            'video',
-                            'fullscreen',
-                        ],
-                    ]
+                    'widgetClass' => CKEditor::className(),
+                    'editorOptions' => [
+						'inline' => false,
+						'toolbar' => [
+							['name' => 'document', 'items' => ['Source']],
+							['name' => 'clipboard', 'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']],
+							['name' => 'basicstyles', 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
+							['name' => 'paragraph', 'items' => ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']],
+							['name' => 'links', 'items' => ['Link', 'Unlink']],
+							['name' => 'insert', 'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe']],
+							['name' => 'styles', 'items' => ['Format', 'FontSize']],
+							['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
+							['name' => 'tools', 'items' => ['ShowBlocks']],
+							['name' => 'about', 'items' => ['About']],
+						],
+						'uploadUrl' => '/sdvsdv'
+					],
                 ];
-                if ($this->redactorImageUpload === true) {
+                /*if ($this->redactorImageUpload === true) {
                     $imageOptions =  [
                         'settings' => [
                             'imageManagerJson' => Url::to(['model/redactor-list', 'name' => $this->getModelName($model), 'attr' => $attribute]),
@@ -293,7 +302,7 @@ class Module extends \yii\base\Module
                         ]
                     ];
                     $options = ArrayHelper::merge($options, $fileOptions);
-                }
+                }*/
                 return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'date':
