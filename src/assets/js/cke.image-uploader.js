@@ -22,6 +22,7 @@ CKEDITOR.plugins.add( 'imageUploader', {
             toolbar: 'insert'
         });
         editor.addCommand('openDialog', {
+			allowedContent: 'img[alt,!src]{border-style,border-width,float,height,margin,margin-bottom,margin-left,margin-right,margin-top,width}',
             exec: function(editor) {
                 fileDialog.click();
             }
