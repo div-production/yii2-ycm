@@ -162,6 +162,10 @@ class Module extends \yii\base\Module
             }
             $model = Yii::createObject($class);
 			
+			if ($this->getHideList($model)) {
+				continue;
+			}
+
             if (is_subclass_of($model, 'yii\db\ActiveRecord')) {
                 $this->models[$name] = $model;
                 $this->modelPaths[$name] = $this->uploadPath . DIRECTORY_SEPARATOR . $folder;
@@ -806,6 +810,24 @@ class Module extends \yii\base\Module
         }
         if (isset($model->hideDeleteAction)) {
             return (bool) $model->hideDeleteAction;
+        } else {
+            return false;
+        }
+    }
+
+	/**
+     * Hide list model action?
+     *
+     * @param string|\yii\db\ActiveRecord $model
+     * @return bool
+     */
+    public function getHideList($model)
+    {
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->hideListAction)) {
+            return (bool) $model->hideListAction;
         } else {
             return false;
         }
