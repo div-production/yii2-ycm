@@ -2,7 +2,6 @@
 namespace janisto\ycm\widgets\TreeGrid;
 
 use Closure;
-use Yii;
 use yii\base\Model;
 use yii\base\Object;
 use yii\data\ActiveDataProvider;
@@ -17,7 +16,8 @@ use yii\helpers\Inflector;
  *
  * @author Leandro Gehlen <leandrogehlen@gmail.com>
  */
-class TreeColumn extends Object {
+class TreeColumn extends Object
+{
 
     /**
      * @var TreeGrid the grid view object that owns this column.

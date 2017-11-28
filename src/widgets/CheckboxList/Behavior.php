@@ -2,7 +2,6 @@
 namespace janisto\ycm\widgets\CheckboxList;
 
 use Yii;
-
 use yii\base\Behavior as BaseBahavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;

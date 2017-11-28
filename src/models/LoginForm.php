@@ -4,12 +4,12 @@ namespace janisto\ycm\models;
 
 use Yii;
 use yii\base\Model;
-use app\models\User;
+use yii\web\IdentityInterface;
 
 /**
  * LoginForm is the model behind the login form.
  *
- * @property User|null $user This property is read-only.
+ * @property IdentityInterface|null $user This property is read-only.
  *
  */
 class LoginForm extends Model
@@ -61,7 +61,7 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
         return false;
     }
@@ -69,7 +69,7 @@ class LoginForm extends Model
     /**
      * Finds user by [[username]]
      *
-     * @return User|null
+     * @return IdentityInterface|null
      */
     public function getUser()
     {
@@ -79,12 +79,13 @@ class LoginForm extends Model
 
         return $this->_user;
     }
-	
-	public function attributeLabels() {
-		return [
-			'username' => 'Имя пользователя',
-			'password' => 'Пароль',
-			'rememberMe' => 'Запомнить меня'
-		];
-	}
+
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Имя пользователя',
+            'password' => 'Пароль',
+            'rememberMe' => 'Запомнить меня',
+        ];
+    }
 }

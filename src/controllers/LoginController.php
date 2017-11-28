@@ -1,14 +1,16 @@
 <?php
 namespace janisto\ycm\controllers;
 
-use Yii;
 use janisto\ycm\models\LoginForm;
+use Yii;
 
-class LoginController extends Controller {
-	public $layout = 'login';
-	
-	public function actionIndex() {
-		if (!Yii::$app->user->isGuest) {
+class LoginController extends Controller
+{
+    public $layout = 'login';
+
+    public function actionIndex()
+    {
+        if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
@@ -19,11 +21,11 @@ class LoginController extends Controller {
         return $this->render('index', [
             'model' => $model,
         ]);
-	}
-	
-	public function actionLogout()
-	{
-		Yii::$app->user->logout();
+    }
+
+    public function actionLogout()
+    {
+        Yii::$app->user->logout();
         return $this->goHome();
-	}
+    }
 }

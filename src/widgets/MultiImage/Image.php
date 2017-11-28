@@ -3,7 +3,6 @@
 namespace janisto\ycm\widgets\MultiImage;
 
 use Yii;
-use janisto\ycm\behaviors\FileBehavior;
 
 /**
  * This is the model class for table "images".
@@ -15,7 +14,8 @@ use janisto\ycm\behaviors\FileBehavior;
  */
 class Image extends \yii\db\ActiveRecord
 {
-	protected $_parent;
+    protected $_parent;
+
     /**
      * @inheritdoc
      */
@@ -34,7 +34,7 @@ class Image extends \yii\db\ActiveRecord
             [['model_id'], 'integer'],
             [['model'], 'string', 'max' => 32],
             [['image'], 'string', 'max' => 64],
-			[['title', 'link'], 'string', 'max' => 255]
+            [['title', 'link'], 'string', 'max' => 255],
         ];
     }
 
@@ -50,34 +50,37 @@ class Image extends \yii\db\ActiveRecord
             'model_id' => 'Model ID',
         ];
     }
-	
-	public function getParent() {
-		if($this->_parent) {
-			return $this->_parent;
-		}
-		else {
-			return $this->hasOne($this->model, ['id' => 'model_id']);
-		}
-	}
-	
-	public function setParent($parent) {
-		$this->_parent = $parent;
-	}
-	
-	public function getFileUrl() {
-		$module = Yii::$app->getModule('ycm');
-		$model = $this->parent;
-		if(!$model) {
-			return '';
-		}
-		$model_name = $module->getModelName($model);
-		$upload_url = Yii::getAlias('@uploadUrl');
-		
-		$path = $upload_url . '/' . strtolower($model_name) . '/' . $this->attribute;
+
+    public function getParent()
+    {
+        if ($this->_parent) {
+            return $this->_parent;
+        } else {
+            return $this->hasOne($this->model, ['id' => 'model_id']);
+        }
+    }
+
+    public function setParent($parent)
+    {
+        $this->_parent = $parent;
+    }
+
+    public function getFileUrl()
+    {
+        $module = Yii::$app->getModule('ycm');
+        $model = $this->parent;
+        if (!$model) {
+            return '';
+        }
+        $model_name = $module->getModelName($model);
+        $upload_url = Yii::getAlias('@uploadUrl');
+
+        $path = $upload_url . '/' . strtolower($model_name) . '/' . $this->attribute;
         return $path . '/' . $this->image;
-	}
-	
-	public function getFilePath() {
-		return Yii::getAlias('@webroot') . $this->getFileUrl();
-	}
+    }
+
+    public function getFilePath()
+    {
+        return Yii::getAlias('@webroot') . $this->getFileUrl();
+    }
 }

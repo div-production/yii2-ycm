@@ -1,9 +1,9 @@
 <?php
 
-use yii\helpers\Html;
-use yii\grid\GridView;
 use janisto\ycm\widgets\Alert;
 use janisto\ycm\widgets\SortableGrid\Widget as SortableGrid;
+use yii\grid\GridView;
+use yii\helpers\Html;
 
 /* @var $this \yii\web\View */
 /* @var $config array */
@@ -27,22 +27,23 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
         if ($module->getHideCreate($model) === false) {
-			if(method_exists($model, 'getCreateParams')) {
-				echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]), array_merge(['create', 'name' => $name], $model->createParams), ['class' => 'btn btn-success']);
-			}
-            else {
-				echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]), ['create', 'name' => $name], ['class' => 'btn btn-success']);
-			}
+            if (method_exists($model, 'getCreateParams')) {
+                echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]),
+                    array_merge(['create', 'name' => $name], $model->createParams), ['class' => 'btn btn-success']);
+            } else {
+                echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]),
+                    ['create', 'name' => $name], ['class' => 'btn btn-success']);
+            }
         }
         ?>
     </p>
-	<?php if (!empty($model->enableAdminSort)): ?>
-		<?php
-		$config['sortableAction'] = ['sort'];
-		$config['model'] = $model;
-		?>
-		<?= SortableGrid::widget($config); ?>
-	<?php else: ?>
-		<?= GridView::widget($config) ?>
-	<?php endif ?>
+    <?php if (!empty($model->enableAdminSort)): ?>
+        <?php
+        $config['sortableAction'] = ['sort'];
+        $config['model'] = $model;
+        ?>
+        <?= SortableGrid::widget($config); ?>
+    <?php else: ?>
+        <?= GridView::widget($config) ?>
+    <?php endif ?>
 </div>

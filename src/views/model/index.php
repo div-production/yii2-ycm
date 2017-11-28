@@ -45,11 +45,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <h3><?= $module->getAdminName($name) ?></h3>
 
-        <?= Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), ['list', 'name' => $name], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), ['list', 'name' => $name],
+            ['class' => 'btn btn-primary']) ?>
 
         <?php
         if ($module->getHideCreate($name) === false) {
-            echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]), ['create', 'name' => $name], ['class' => 'btn btn-success']);
+            echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]),
+                ['create', 'name' => $name], ['class' => 'btn btn-success']);
         }
         ?>
 
@@ -63,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 'options' => [
                     'class' => 'btn btn-default',
-                ]
+                ],
             ]);
         }
         ?>

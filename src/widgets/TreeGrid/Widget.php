@@ -5,12 +5,12 @@ use Closure;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Widget as BaseWidget;
+use yii\data\ActiveDataProvider;
 use yii\grid\DataColumn;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\i18n\Formatter;
-use yii\data\ActiveDataProvider;
 
 /**
  * TreeGrid renders a jQuery TreeGrid component.
@@ -19,7 +19,8 @@ use yii\data\ActiveDataProvider;
  * @see https://github.com/maxazan/jquery-treegrid
  * @author Leandro Gehlen <leandrogehlen@gmail.com>
  */
-class Widget extends BaseWidget {
+class Widget extends BaseWidget
+{
 
     /**
      * @var \yii\data\ActiveDataProvider the data provider for the view. This property is required.
@@ -145,7 +146,7 @@ class Widget extends BaseWidget {
      * @see \yii\grid::$columns for details.
      */
     public $columns = [];
-    
+
     /**
      * @var boolean enable or disable ajax mode
      */
@@ -154,22 +155,21 @@ class Widget extends BaseWidget {
      * Initializes the grid view.
      * This method will initialize required property values and instantiate [[columns]] objects.
      */
-    
+
     public $model;
-    
+
     public $enableMultiRoot = false;
-    
+
     public function init()
     {
         if ($this->dataProvider === null) {
-            if($this->model) {
+            if ($this->model) {
                 $this->dataProvider = new ActiveDataProvider([
                     'query' => $this->model->find(),
-                    'pagination' => false
+                    'pagination' => false,
                 ]);
                 $this->options['data-model'] = $this->model->className();
-            }
-            else {
+            } else {
                 throw new InvalidConfigException('The "dataProvider" or "model" property must be set.');
             }
         }
@@ -195,8 +195,8 @@ class Widget extends BaseWidget {
         if (!$this->parentColumnName) {
             throw new InvalidConfigException('The "parentColumnName" property must be specified"');
         }
-        
-        if($this->ajaxMode) {
+
+        if ($this->ajaxMode) {
             $this->pluginOptions['ajaxMode'] = true;
         }
 
@@ -208,12 +208,12 @@ class Widget extends BaseWidget {
      */
     public function run()
     {
-        if(Yii::$app->request->isAjax && $parentId = Yii::$app->request->post('treegrid_id')) {
+        if (Yii::$app->request->isAjax && $parentId = Yii::$app->request->post('treegrid_id')) {
             return $this->renderAjaxData($parentId);
         }
-        
+
         $id = $this->options['id'];
-        
+
         $options = Json::htmlEncode($this->pluginOptions);
 
         $view = $this->getView();
@@ -229,7 +229,7 @@ class Widget extends BaseWidget {
             $content = array_filter([
                 $header,
                 $body,
-                $footer
+                $footer,
             ]);
 
             return Html::tag('table', implode("\n", $content), $this->options);
@@ -247,7 +247,8 @@ class Widget extends BaseWidget {
     {
         $options = $this->emptyTextOptions;
         $tag = ArrayHelper::remove($options, 'tag', 'div');
-        return Html::tag($tag, ($this->emptyText === null ? Yii::t('yii', 'No results found.') : $this->emptyText), $options);
+        return Html::tag($tag, ($this->emptyText === null ? Yii::t('yii', 'No results found.') : $this->emptyText),
+            $options);
     }
 
     /**
@@ -269,15 +270,15 @@ class Widget extends BaseWidget {
         } else {
             $options = $this->rowOptions;
         }
-        $options['data-key'] = is_array($key) ? json_encode($key) : (string) $key;
+        $options['data-key'] = is_array($key) ? json_encode($key) : (string)$key;
 
         $id = ArrayHelper::getValue($model, $this->keyColumnName);
         Html::addCssClass($options, "treegrid-$id");
 
         $parentId = ArrayHelper::getValue($model, $this->parentColumnName);
-        
+
         if ($parentId) {
-            if(ArrayHelper::getValue($this->pluginOptions, 'initialState') == 'collapsed'){
+            if (ArrayHelper::getValue($this->pluginOptions, 'initialState') == 'collapsed') {
                 Html::addCssStyle($options, 'display: none;');
             }
             Html::addCssClass($options, "treegrid-parent-$parentId");
@@ -322,17 +323,17 @@ class Widget extends BaseWidget {
     public function renderItems()
     {
         $rows = [];
-        
-        if($this->ajaxMode) {
+
+        if ($this->ajaxMode) {
             $this->dataProvider->query->andWhere([$this->parentColumnName => $this->parentRootValue]);
         }
-        
+
         $models = array_values($this->dataProvider->getModels());
-        
+
         $keys = $this->dataProvider->getKeys();
-        
-        $models = $this->normalizeData($models,$this->parentRootValue);
-        
+
+        $models = $this->normalizeData($models, $this->parentRootValue);
+
         foreach ($models as $index => $model) {
             $key = $keys[$index];
             if ($this->beforeRow !== null) {
@@ -373,7 +374,7 @@ class Widget extends BaseWidget {
                 $column = $this->createDataColumn($column);
             } else {
                 $column = Yii::createObject(array_merge([
-                    'class' => $this->dataColumnClass ? : TreeColumn::className(),
+                    'class' => $this->dataColumnClass ?: TreeColumn::className(),
                     'grid' => $this,
                 ], $column));
             }
@@ -398,7 +399,7 @@ class Widget extends BaseWidget {
         }
 
         return Yii::createObject([
-            'class' => $this->dataColumnClass ? : TreeColumn::className(),
+            'class' => $this->dataColumnClass ?: TreeColumn::className(),
             'grid' => $this,
             'attribute' => $matches[1],
             'format' => isset($matches[3]) ? $matches[3] : 'text',
@@ -427,9 +428,10 @@ class Widget extends BaseWidget {
      * @param string $parentId
      * @return array
      */
-    protected function normalizeData(array &$data, $parentId = null) {
+    protected function normalizeData(array &$data, $parentId = null)
+    {
         $result = [];
-        
+
         foreach ($data as $key => $element) {
             if ($element[$this->parentColumnName] == $parentId) {
                 $result[] = $element;
@@ -444,16 +446,17 @@ class Widget extends BaseWidget {
         }
         return $result;
     }
-    
-    public function renderAjaxData($categoryId) {
+
+    public function renderAjaxData($categoryId)
+    {
         $this->dataProvider->query->andWhere([$this->parentColumnName => $categoryId]);
         $models = $this->dataProvider->getModels();
         $rows = [];
-        
-        foreach($models as $model) {
+
+        foreach ($models as $model) {
             $rows[] = $this->renderTableRow($model, $model->primaryKey, 1);
         }
-        
+
         return implode('', $rows);
     }
 } 

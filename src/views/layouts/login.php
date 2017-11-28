@@ -1,10 +1,6 @@
 <?php
 
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -33,7 +29,7 @@ $assetBundle::register($this);
         <?= $content ?>
         </div>
     </div>
-<?php $this->endBody() ?>
+    <?php $this->endBody() ?>
 </body>
 </html>
 <?php $this->endPage() ?>

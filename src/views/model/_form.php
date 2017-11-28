@@ -1,9 +1,8 @@
 <?php
 
+use janisto\ycm\widgets\Alert;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use janisto\ycm\widgets\Alert;
-use yii\bootstrap\Tabs;
 
 /* @var $this \yii\web\View */
 /* @var $model \yii\db\ActiveRecord */
@@ -37,22 +36,29 @@ $attributes = array_filter(array_unique(array_map('trim', $attributes)));
 
         <?php
         if (($module->getHideCreate($model) === true && $this->context->action->id == 'create') ||
-            ($module->getHideUpdate($model) === true && $this->context->action->id == 'update')):
+            ($module->getHideUpdate($model) === true && $this->context->action->id == 'update')
+        ):
             // Save disabled. Add a note?
         else:
             ?>
-			
-			<? if ($module->getHideOk($model) === false): ?>
-				<?= Html::submitButton(Yii::t('ycm', 'Save'), ['name' => '_save', 'value' => '1', 'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-			<? endif ?>
-			
-			<? if ($module->getHideCreate($model) === false): ?>
-				<?= Html::submitButton(Yii::t('ycm', 'Save and add another'), ['name' => '_addanother', 'value' => '1', 'class' => 'btn btn-default']) ?>
-			<? endif ?>	
-		
-            <?= Html::submitButton(Yii::t('ycm', 'Save and continue editing'), ['name' => '_continue', 'value' => '1', 'class' => 'btn btn-default']) ?>
 
-        <?php
+            <? if ($module->getHideOk($model) === false): ?>
+            <?= Html::submitButton(Yii::t('ycm', 'Save'), [
+                'name' => '_save',
+                'value' => '1',
+                'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary',
+            ]) ?>
+        <? endif ?>
+
+            <? if ($module->getHideCreate($model) === false): ?>
+            <?= Html::submitButton(Yii::t('ycm', 'Save and add another'),
+                ['name' => '_addanother', 'value' => '1', 'class' => 'btn btn-default']) ?>
+        <? endif ?>
+
+            <?= Html::submitButton(Yii::t('ycm', 'Save and continue editing'),
+            ['name' => '_continue', 'value' => '1', 'class' => 'btn btn-default']) ?>
+
+            <?php
         endif;
 
         if (!$model->isNewRecord && $module->getHideDelete($model) === false): ?>

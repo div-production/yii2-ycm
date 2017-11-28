@@ -2,30 +2,28 @@
 
 namespace janisto\ycm\controllers;
 
-use Yii;
+use janisto\ycm\behaviors\AccessControl;
+use janisto\ycm\widgets\SortableGrid\SortableGridAction;
 use vova07\imperavi\helpers\FileHelper as RedactorFileHelper;
+use Yii;
 use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
-use janisto\ycm\behaviors\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
+use yii\imagine\Image;
 use yii\validators\BooleanValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
-use yii\imagine\Image;
-use janisto\ycm\widgets\TreeGrid\Widget as TreeGrid;
-use janisto\ycm\widgets\SortableGrid\SortableGridAction;
-use yii\data\Sort;
 
 class ModelController extends Controller
 {
-	public $enableCsrfValidation = false;
+    public $enableCsrfValidation = false;
 
     /** @inheritdoc */
     public function behaviors()
@@ -35,12 +33,22 @@ class ModelController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['index', 'list', 'create', 'update', 'delete', 'redactor-upload', 'redactor-list', 'get-tree', 'sort'],
+                        'actions' => [
+                            'index',
+                            'list',
+                            'create',
+                            'update',
+                            'delete',
+                            'redactor-upload',
+                            'redactor-list',
+                            'get-tree',
+                            'sort',
+                        ],
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
                             return in_array(Yii::$app->user->identity->username, $this->module->admins);
-                        }
+                        },
                     ],
 
                 ],
@@ -56,15 +64,15 @@ class ModelController extends Controller
             ],
         ];
     }
-	
-	public function actions()
-	{
-		return [
-			'sort' => [
-				'class' => SortableGridAction::className(),
-			],
-		];
-	}
+
+    public function actions()
+    {
+        return [
+            'sort' => [
+                'class' => SortableGridAction::className(),
+            ],
+        ];
+    }
 
     /**
      * Default action.
@@ -90,11 +98,11 @@ class ModelController extends Controller
     {
         /** @var $module \janisto\ycm\Module */
         $module = $this->module;
-        $name = (string) $name;
-        $attribute = (string) $attr;
+        $name = (string)$name;
+        $attribute = (string)$attr;
         $uploadType = 'image';
         $validatorOptions = $module->redactorImageUploadOptions;
-        if ((string) $type == 'file') {
+        if ((string)$type == 'file') {
             $uploadType = 'file';
             $validatorOptions = $module->redactorFileUploadOptions;
         }
@@ -109,7 +117,7 @@ class ModelController extends Controller
         $model->addRule('file', $uploadType, $validatorOptions)->validate();
         if ($model->hasErrors()) {
             $result = [
-                'error' => $model->getFirstError('file')
+                'error' => $model->getFirstError('file'),
             ];
         } else {
             if ($model->file->extension) {
@@ -118,8 +126,8 @@ class ModelController extends Controller
             $path = $attributePath . DIRECTORY_SEPARATOR . $model->file->name;
             if ($model->file->saveAs($path)) {
                 $result = ['url' => $module->getAttributeUrl($name, $attribute, $model->file->name)];
-                    $result['fileName'] = $model->file->name;
-					$result['uploaded'] = 1;
+                $result['fileName'] = $model->file->name;
+                $result['uploaded'] = 1;
             } else {
                 $result = [
                     'error' => Yii::t('ycm', 'Could not upload file.'),
@@ -142,17 +150,17 @@ class ModelController extends Controller
     {
         /** @var $module \janisto\ycm\Module */
         $module = $this->module;
-        $name = (string) $name;
-        $attribute = (string) $attr;
+        $name = (string)$name;
+        $attribute = (string)$attr;
         $attributePath = $module->getAttributePath($name, $attribute);
         $attributeUrl = $module->getAttributeUrl($name, $attribute, '');
         $format = 0;
         $options = [
             'url' => $attributeUrl,
             'only' => ['*.png', '*.gif', '*.jpg', '*.jpeg'],
-            'caseSensitive' => false
+            'caseSensitive' => false,
         ];
-        if ((string) $type == 'file') {
+        if ((string)$type == 'file') {
             $format = 1;
             $options = [
                 'url' => $attributeUrl,
@@ -248,7 +256,7 @@ class ModelController extends Controller
             'urlCreator' => function ($action, $model, $key, $index) {
                 $name = Yii::$app->getRequest()->getQueryParam('name');
                 return Url::to([$action, 'name' => $name, 'pk' => $key]);
-            }
+            },
         ]);
 
         if (method_exists($model, 'search')) {
@@ -282,12 +290,13 @@ class ModelController extends Controller
                 'showOnEmpty' => false,
             ];
         }
-		
-		if(isset($model->viewType)) {
-			$viewType = $model->viewType;
-			$config['dataProvider']->pagination = false;
-		}
-		else $viewType = 'list';
+
+        if (isset($model->viewType)) {
+            $viewType = $model->viewType;
+            $config['dataProvider']->pagination = false;
+        } else {
+            $viewType = 'list';
+        }
 
         return $this->render($viewType, [
             'config' => $config,
@@ -295,7 +304,7 @@ class ModelController extends Controller
             'name' => $name,
         ]);
     }
-	
+
     /**
      * Create model.
      *
@@ -311,8 +320,8 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name);
-		
-		$demo = $module->isDemo();
+
+        $demo = $module->isDemo();
 
         if ($model->load(Yii::$app->request->post()) && !$demo) {
             $filePaths = [];
@@ -342,7 +351,8 @@ class ModelController extends Controller
                 }
             }
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('ycm', '{name} has been created.', ['name' => $module->getSingularName($name)]));
+                Yii::$app->session->setFlash('success',
+                    Yii::t('ycm', '{name} has been created.', ['name' => $module->getSingularName($name)]));
                 if (Yii::$app->request->post('_addanother')) {
                     return $this->redirect(['create', 'name' => $name]);
                 } elseif (Yii::$app->request->post('_continue')) {
@@ -386,9 +396,9 @@ class ModelController extends Controller
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
-		
-		$demo = $module->isDemo();
-		
+
+        $demo = $module->isDemo();
+
         if ($model->load(Yii::$app->request->post()) && !$demo) {
             $filePaths = [];
             foreach ($model->tableSchema->columns as $column) {
@@ -432,7 +442,8 @@ class ModelController extends Controller
                 }
             }
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('ycm', '{name} has been updated.', ['name' => $module->getSingularName($name)]));
+                Yii::$app->session->setFlash('success',
+                    Yii::t('ycm', '{name} has been updated.', ['name' => $module->getSingularName($name)]));
                 if (Yii::$app->request->post('_addanother')) {
                     return $this->redirect(['create', 'name' => $name]);
                 } elseif (Yii::$app->request->post('_continue')) {
@@ -454,7 +465,7 @@ class ModelController extends Controller
                     }
                 }
             }
-		} elseif (Yii::$app->request->method == 'POST' && $demo) {
+        } elseif (Yii::$app->request->method == 'POST' && $demo) {
             Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t edit entries in demo mode'));
         }
 
@@ -478,42 +489,45 @@ class ModelController extends Controller
         /** @var $model \yii\db\ActiveRecord */
         $model = $module->loadModel($name, $pk);
 
-		if ($module->isDemo()) {
-			Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t delete entries in demo mode'));
-		} elseif ($model->delete() !== false) {
-            Yii::$app->session->setFlash('success', Yii::t('ycm', '{name} has been deleted.', ['name' => $module->getSingularName($name)]));
+        if ($module->isDemo()) {
+            Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t delete entries in demo mode'));
+        } elseif ($model->delete() !== false) {
+            Yii::$app->session->setFlash('success',
+                Yii::t('ycm', '{name} has been deleted.', ['name' => $module->getSingularName($name)]));
         } else {
-            Yii::$app->session->setFlash('error', Yii::t('ycm', 'Could not delete {name}.', ['name' => $module->getSingularName($name)]));
+            Yii::$app->session->setFlash('error',
+                Yii::t('ycm', 'Could not delete {name}.', ['name' => $module->getSingularName($name)]));
         }
 
         return $this->redirect(['list', 'name' => $name]);
     }
-    
-    public function actionGetTree() {
-        if($model = Yii::$app->request->post('model')) {
+
+    public function actionGetTree()
+    {
+        if ($model = Yii::$app->request->post('model')) {
             $model = new $model;
-        }
-        else {
+        } else {
             return false;
         }
         return $this->renderPartial('_tree', ['model' => $model]);
     }
-	
-	protected function saveFile(UploadedFile $file, $path) {
-		$module = $this->module;
-		
-		if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
-			Image::thumbnail($file->tempName, 1900, null)->save($path, [
-				'quality' => 70,
-			]);
-		} else {
-			$file->saveAs($path);
-		}
-		
-		return true;
-	}
-	
-	public function redirect($url, $statusCode = 302)
+
+    protected function saveFile(UploadedFile $file, $path)
+    {
+        $module = $this->module;
+
+        if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
+            Image::thumbnail($file->tempName, 1900, null)->save($path, [
+                'quality' => 70,
+            ]);
+        } else {
+            $file->saveAs($path);
+        }
+
+        return true;
+    }
+
+    public function redirect($url, $statusCode = 302)
     {
         return Yii::$app->getResponse()->redirect(Url::to($url), $statusCode, false);
     }

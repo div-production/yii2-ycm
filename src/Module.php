@@ -2,22 +2,20 @@
 
 namespace janisto\ycm;
 
-use Yii;
-use janisto\timepicker\TimePicker;
+use app\widgets\timetable\Widget as TimetableWidget;
 use dosamigos\ckeditor\CKEditor;
+use janisto\timepicker\TimePicker;
 use vova07\select2\Widget as Select2Widget;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\bootstrap\Modal;
+use yii\bootstrap\Tabs;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
-use yii\web\JsExpression;
 use yii\web\NotFoundHttpException;
-use yii\bootstrap\Tabs;
-
-use app\widgets\timetable\Widget as TimetableWidget;
 
 /**
  * Main module class for yii2-ycm.
@@ -65,8 +63,8 @@ class Module extends \yii\base\Module
     /** @var array The default URL rules to be used in module. */
     public $urlRules = [
         '' => 'default/index',
-		'login' => 'login/index',
-		'logout' => 'login/logout',
+        'login' => 'login/index',
+        'logout' => 'login/logout',
         'model/<action:[\w-]+>/<name:\w+>/<pk:\d+>' => 'model/<action>',
         'model/<action:[\w-]+>/<name:\w+>' => 'model/<action>',
         'model/<action:[\w-]+>' => 'model/<action>',
@@ -94,19 +92,19 @@ class Module extends \yii\base\Module
     /** @var array Model upload URLs. */
     protected $modelUrls = [];
 
-    /** @var string Upload path.  */
+    /** @var string Upload path. */
     public $uploadPath;
 
-    /** @var string Upload URL.  */
+    /** @var string Upload URL. */
     public $uploadUrl;
 
     /** @var integer Upload permissions for folders. */
     public $uploadPermissions = 0775;
 
-    /** @var boolean Whether to delete the temporary uploaded file after saving.  */
+    /** @var boolean Whether to delete the temporary uploaded file after saving. */
     public $uploadDeleteTempFile = true;
 
-    /** @var boolean Whether to enable redactor image uploads.  */
+    /** @var boolean Whether to enable redactor image uploads. */
     public $redactorImageUpload = true;
 
     /** @var array Redactor image upload validation rules. */
@@ -116,7 +114,7 @@ class Module extends \yii\base\Module
         'maxSize' => 1048576, // 1024 * 1024 = 1MB
     ];
 
-    /** @var boolean Whether to enable redactor file uploads.  */
+    /** @var boolean Whether to enable redactor file uploads. */
     public $redactorFileUpload = true;
 
     /** @var array Redactor file upload validation rules. */
@@ -137,7 +135,7 @@ class Module extends \yii\base\Module
         parent::init();
 
         $this->setAliases([
-            '@ycm' => __DIR__
+            '@ycm' => __DIR__,
         ]);
 
         $this->setViewPath('@ycm/views');
@@ -161,24 +159,24 @@ class Module extends \yii\base\Module
                 $folder = strtolower($name);
             }
             $model = Yii::createObject($class);
-			
-			if ($this->getHideList($model)) {
-				continue;
-			}
+
+            if ($this->getHideList($model)) {
+                continue;
+            }
 
             if (is_subclass_of($model, 'yii\db\ActiveRecord')) {
                 $this->models[$name] = $model;
                 $this->modelPaths[$name] = $this->uploadPath . DIRECTORY_SEPARATOR . $folder;
                 $this->modelUrls[$name] = $this->uploadUrl . '/' . $folder;
             }
-			
-			if (isset($model->adminUrl)) {
-				$viewUrl = $model->adminUrl;
-			} else {
-				$viewUrl = ['model/list', 'name' => $name];
-			}
-			
-			$this->sidebarItems[] = ['label' => $this->getPluralName($model), 'url' => $viewUrl];
+
+            if (isset($model->adminUrl)) {
+                $viewUrl = $model->adminUrl;
+            } else {
+                $viewUrl = ['model/list', 'name' => $name];
+            }
+
+            $this->sidebarItems[] = ['label' => $this->getPluralName($model), 'url' => $viewUrl];
         }
 
         foreach ($this->registerControllers as $name => $class) {
@@ -191,7 +189,7 @@ class Module extends \yii\base\Module
      *
      * @return array Models
      */
-    public function getModels ()
+    public function getModels()
     {
         return $this->models;
     }
@@ -224,7 +222,7 @@ class Module extends \yii\base\Module
      */
     public function loadModel($name, $pk = null)
     {
-        $name = (string) $name;
+        $name = (string)$name;
         if (!ArrayHelper::keyExists($name, $this->models)) {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
@@ -233,7 +231,7 @@ class Module extends \yii\base\Module
         $model = $this->models[$name];
 
         if ($pk !== null) {
-            if (($model = $model->findOne((int) $pk)) !== null) {
+            if (($model = $model->findOne((int)$pk)) !== null) {
                 /** @var $model \yii\db\ActiveRecord */
                 return $model;
             } else {
@@ -254,7 +252,9 @@ class Module extends \yii\base\Module
     public function createWidget($form, $model, $attribute)
     {
         $widget = $this->getAttributeWidget($model, $attribute);
-		if(!$widget) return;
+        if (!$widget) {
+            return;
+        }
         $tableSchema = $model->getTableSchema();
 
         switch ($widget) {
@@ -262,27 +262,65 @@ class Module extends \yii\base\Module
                 return $this->createField($form, $model, $attribute, [], 'widget');
 
             case 'wysiwyg':
-				$imageUploaderUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/js/cke.image-uploader.js';
-				Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
+                $imageUploaderUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/js/cke.image-uploader.js';
+                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
                 $options = [
                     'widgetClass' => CKEditor::className(),
                     'clientOptions' => [
-						'inline' => false,
-						'toolbar' => [
-							['name' => 'document', 'items' => ['Source']],
-							['name' => 'clipboard', 'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']],
-							['name' => 'basicstyles', 'items' => ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']],
-							['name' => 'paragraph', 'items' => ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']],
-							['name' => 'links', 'items' => ['Link', 'Unlink']],
-							['name' => 'insert', 'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe']],
-							['name' => 'styles', 'items' => ['Format', 'FontSize']],
-							['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
-							['name' => 'tools', 'items' => ['ShowBlocks']],
-							['name' => 'about', 'items' => ['About']],
-						],
-						'extraPlugins' => 'imageUploader,filetools',
-						'uploadUrl' => Url::to(['model/redactor-upload', 'name' => $this->getModelName($model), 'attr' => $attribute]),
-					],
+                        'inline' => false,
+                        'toolbar' => [
+                            ['name' => 'document', 'items' => ['Source']],
+                            [
+                                'name' => 'clipboard',
+                                'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+                            ],
+                            [
+                                'name' => 'basicstyles',
+                                'items' => [
+                                    'Bold',
+                                    'Italic',
+                                    'Underline',
+                                    'Strike',
+                                    'Subscript',
+                                    'Superscript',
+                                    '-',
+                                    'RemoveFormat',
+                                ],
+                            ],
+                            [
+                                'name' => 'paragraph',
+                                'items' => [
+                                    'NumberedList',
+                                    'BulletedList',
+                                    '-',
+                                    'Outdent',
+                                    'Indent',
+                                    '-',
+                                    'CreateDiv',
+                                    '-',
+                                    'JustifyLeft',
+                                    'JustifyCenter',
+                                    'JustifyRight',
+                                    'JustifyBlock',
+                                ],
+                            ],
+                            ['name' => 'links', 'items' => ['Link', 'Unlink']],
+                            [
+                                'name' => 'insert',
+                                'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe'],
+                            ],
+                            ['name' => 'styles', 'items' => ['Format', 'FontSize']],
+                            ['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
+                            ['name' => 'tools', 'items' => ['ShowBlocks']],
+                            ['name' => 'about', 'items' => ['About']],
+                        ],
+                        'extraPlugins' => 'imageUploader,filetools',
+                        'uploadUrl' => Url::to([
+                            'model/redactor-upload',
+                            'name' => $this->getModelName($model),
+                            'attr' => $attribute,
+                        ]),
+                    ],
                 ];
                 /*if ($this->redactorImageUpload === true) {
                     $imageOptions =  [
@@ -316,7 +354,7 @@ class Module extends \yii\base\Module
                 $options = [
                     'widgetClass' => TimePicker::className(),
                     'mode' => 'date',
-                    'clientOptions'=>[
+                    'clientOptions' => [
                         'dateFormat' => 'yy-mm-dd',
                     ],
                 ];
@@ -326,7 +364,7 @@ class Module extends \yii\base\Module
                 $options = [
                     'widgetClass' => TimePicker::className(),
                     'mode' => 'time',
-                    'clientOptions'=>[
+                    'clientOptions' => [
                         'timeFormat' => 'HH:mm:ss',
                         'showSecond' => true,
                     ],
@@ -337,7 +375,7 @@ class Module extends \yii\base\Module
                 $options = [
                     'widgetClass' => TimePicker::className(),
                     'mode' => 'datetime',
-                    'clientOptions'=>[
+                    'clientOptions' => [
                         'dateFormat' => 'yy-mm-dd',
                         'timeFormat' => 'HH:mm:ss',
                         'showSecond' => true,
@@ -348,7 +386,8 @@ class Module extends \yii\base\Module
             case 'select':
                 $options = [
                     'options' => [
-                        'placeholder' => Yii::t('ycm', 'Choose {name}', ['name' => $model->getAttributeLabel($attribute)]),
+                        'placeholder' => Yii::t('ycm', 'Choose {name}',
+                            ['name' => $model->getAttributeLabel($attribute)]),
                     ],
                     'settings' => [
                         'allowClear' => true,
@@ -364,7 +403,8 @@ class Module extends \yii\base\Module
                 $options = [
                     'options' => [
                         'multiple' => true,
-                        'placeholder' => Yii::t('ycm', 'Choose {name}', ['name' => $model->getAttributeLabel($attribute)]),
+                        'placeholder' => Yii::t('ycm', 'Choose {name}',
+                            ['name' => $model->getAttributeLabel($attribute)]),
                     ],
                     'settings' => [
                         'width' => '100%',
@@ -380,15 +420,16 @@ class Module extends \yii\base\Module
                     $inputId = strtolower($className . '-' . $attribute . '_delete');
                     $url = $this->getAttributeUrl($this->getModelName($model), $attribute, $model->$attribute);
                     ob_start();
-                    echo '<div class="checkbox"><label for="'. $inputId .'">
-                        <input type="checkbox" name="' . $inputName . '" id="' . $inputId . '" value="delete"> ' . Yii::t('ycm', 'Delete image') . '
+                    echo '<div class="checkbox"><label for="' . $inputId . '">
+                        <input type="checkbox" name="' . $inputName . '" id="' . $inputId . '" value="delete"> ' . Yii::t('ycm',
+                            'Delete image') . '
                     </label></div>';
                     Modal::begin([
                         'size' => Modal::SIZE_LARGE,
-                        'header' => '<h4>' . Yii::t('ycm', 'Preview image') .'</h4>',
+                        'header' => '<h4>' . Yii::t('ycm', 'Preview image') . '</h4>',
                         'toggleButton' => ['label' => Yii::t('ycm', 'Preview image'), 'class' => 'btn btn-info btn-sm'],
                     ]);
-                    echo Html::img($url, ['class'=>'modal-image']);
+                    echo Html::img($url, ['class' => 'modal-image']);
                     Modal::end();
                     $html = ob_get_clean();
                     $options['hint'] = $html;
@@ -402,20 +443,21 @@ class Module extends \yii\base\Module
                     $inputName = $className . '[' . $attribute . '_delete]';
                     $inputId = strtolower($className . '-' . $attribute . '_delete');
                     $url = $this->getAttributeUrl($this->getModelName($model), $attribute, $model->$attribute);
-                    $html = '<div class="checkbox"><label for="'. $inputId .'">
-                        <input type="checkbox" name="' . $inputName . '" id="' . $inputId . '" value="delete"> ' . Yii::t('ycm', 'Delete file') . '
+                    $html = '<div class="checkbox"><label for="' . $inputId . '">
+                        <input type="checkbox" name="' . $inputName . '" id="' . $inputId . '" value="delete"> ' . Yii::t('ycm',
+                            'Delete file') . '
                     </label></div>';
-                    $html .= Html::a(Yii::t('ycm', 'Download file'), $url, ['class'=>'btn btn-info btn-sm']);
+                    $html .= Html::a(Yii::t('ycm', 'Download file'), $url, ['class' => 'btn btn-info btn-sm']);
                     $options['hint'] = $html;
                 }
                 return $this->createField($form, $model, $attribute, $options, 'fileInput');
 
             case 'text':
                 $options = [];
-				if(isset($tableSchema->columns[$attribute])) {
-					$options['maxlength'] = $tableSchema->columns[$attribute]->size;
-				}
-                
+                if (isset($tableSchema->columns[$attribute])) {
+                    $options['maxlength'] = $tableSchema->columns[$attribute]->size;
+                }
+
                 return $this->createField($form, $model, $attribute, $options, 'textInput');
 
             case 'hidden':
@@ -588,7 +630,9 @@ class Module extends \yii\base\Module
                 return $this->attributeWidgets->$attribute;
             } else {
                 $tableSchema = $model->getTableSchema();
-				if(!isset($tableSchema->columns[$attribute])) return null;
+                if (!isset($tableSchema->columns[$attribute])) {
+                    return null;
+                }
                 $column = $tableSchema->columns[$attribute];
                 if ($column->phpType === 'boolean') {
                     return 'checkbox';
@@ -612,12 +656,12 @@ class Module extends \yii\base\Module
             foreach ($attributeWidgets as $item) {
                 if (isset($item[0]) && isset($item[1])) {
                     $data[$item[0]] = $item[1];
-                    $data[$item[0].'Options'] = $item;
+                    $data[$item[0] . 'Options'] = $item;
                 }
             }
         }
 
-        $this->attributeWidgets = (object) $data;
+        $this->attributeWidgets = (object)$data;
 
         return $this->getAttributeWidget($model, $attribute);
     }
@@ -633,7 +677,7 @@ class Module extends \yii\base\Module
     protected function getAttributeChoices($model, $attribute)
     {
         $data = [];
-        $choicesName = (string) $attribute . 'Choices';
+        $choicesName = (string)$attribute . 'Choices';
         if (method_exists($model, $choicesName) && is_array($model->$choicesName())) {
             $data = $model->$choicesName();
         } elseif (isset($model->$choicesName) && is_array($model->$choicesName)) {
@@ -651,7 +695,7 @@ class Module extends \yii\base\Module
      */
     protected function getAttributeOptions($attribute, $options = [])
     {
-        $optionsName = (string) $attribute . 'Options';
+        $optionsName = (string)$attribute . 'Options';
         if (isset($this->attributeWidgets->$optionsName)) {
             $attributeOptions = array_slice($this->attributeWidgets->$optionsName, 2);
             if (empty($options)) {
@@ -738,28 +782,29 @@ class Module extends \yii\base\Module
             $model = $this->loadModel($model);
         }
         if (isset($model->hideCreateAction)) {
-            return (bool) $model->hideCreateAction;
+            return (bool)$model->hideCreateAction;
         } else {
             return false;
         }
     }
-	
-	/**
+
+    /**
      * Hide OK model action?
      *
      * @param string|\yii\db\ActiveRecord $model
      * @return bool
      */
-	public function getHideOk($model) {
-		if (is_string($model)) {
+    public function getHideOk($model)
+    {
+        if (is_string($model)) {
             $model = $this->loadModel($model);
         }
         if (isset($model->hideOkAction)) {
-            return (bool) $model->hideOkAction;
+            return (bool)$model->hideOkAction;
         } else {
             return false;
         }
-	}
+    }
 
     /**
      * Hide update model action?
@@ -773,7 +818,7 @@ class Module extends \yii\base\Module
             $model = $this->loadModel($model);
         }
         if (isset($model->hideUpdateAction)) {
-            return (bool) $model->hideUpdateAction;
+            return (bool)$model->hideUpdateAction;
         } else {
             return false;
         }
@@ -791,7 +836,7 @@ class Module extends \yii\base\Module
             $model = $this->loadModel($model);
         }
         if (isset($model->hideEditAction)) {
-            return (bool) $model->hideEditAction;
+            return (bool)$model->hideEditAction;
         } else {
             return false;
         }
@@ -809,13 +854,13 @@ class Module extends \yii\base\Module
             $model = $this->loadModel($model);
         }
         if (isset($model->hideDeleteAction)) {
-            return (bool) $model->hideDeleteAction;
+            return (bool)$model->hideDeleteAction;
         } else {
             return false;
         }
     }
 
-	/**
+    /**
      * Hide list model action?
      *
      * @param string|\yii\db\ActiveRecord $model
@@ -827,7 +872,7 @@ class Module extends \yii\base\Module
             $model = $this->loadModel($model);
         }
         if (isset($model->hideListAction)) {
-            return (bool) $model->hideListAction;
+            return (bool)$model->hideListAction;
         } else {
             return false;
         }
@@ -886,14 +931,14 @@ class Module extends \yii\base\Module
             return false;
         }
     }
-	
-	/**
+
+    /**
      * Download Excel in new format?
      *
      * @param string|\yii\db\ActiveRecord $model
      * @return bool
      */
-	public function getDownloadExcelNew($model)
+    public function getDownloadExcelNew($model)
     {
         if (is_string($model)) {
             $model = $this->loadModel($model);
@@ -923,7 +968,7 @@ class Module extends \yii\base\Module
         }
     }
 
-	public function isDemo()
+    public function isDemo()
     {
         $demo = getenv('YII_DEMO');
         if ($demo == 'true' || $demo === true) {
@@ -932,45 +977,45 @@ class Module extends \yii\base\Module
             return false;
         }
     }
-	
-	public function createTabs($form, $model, $attributes)
-	{
-		if (method_exists($model, 'attributeTabs')) {
-			$attributeTabs = $model->attributeTabs();
-			$tabs = [
-				[
-					'label' => 'Основное',
-					'content' => '<br>',
-					'active' => true,
-				],
-			];
-			foreach ($attributeTabs as $tabConfig) {
-				$tab = [
-					'label' => $tabConfig['label'],
-					'content' => '<br>',
-				];
-				foreach ($tabConfig['fields'] as $field) {
-					$tab['content'] .= $this->createWidget($form, $model, $field);
-					$attrKey = array_search($field, $attributes);
-					if ($attrKey !== false) {
-						unset($attributes[$attrKey]);
-					}
-				}
-				$tabs[] = $tab;
-			}
-			foreach ($attributes as $attr) {
-				$tabs[0]['content'] .= $this->createWidget($form, $model, $attr);
-			}
-			
-			return Tabs::widget([
-				'items' => $tabs,
-			]);
-		} else {
-			$result = '';
-			foreach ($attributes as $attribute) {
-				$result .= $this->createWidget($form, $model, $attribute);
-			}
-			return $result;
-		}
-	}
+
+    public function createTabs($form, $model, $attributes)
+    {
+        if (method_exists($model, 'attributeTabs')) {
+            $attributeTabs = $model->attributeTabs();
+            $tabs = [
+                [
+                    'label' => 'Основное',
+                    'content' => '<br>',
+                    'active' => true,
+                ],
+            ];
+            foreach ($attributeTabs as $tabConfig) {
+                $tab = [
+                    'label' => $tabConfig['label'],
+                    'content' => '<br>',
+                ];
+                foreach ($tabConfig['fields'] as $field) {
+                    $tab['content'] .= $this->createWidget($form, $model, $field);
+                    $attrKey = array_search($field, $attributes);
+                    if ($attrKey !== false) {
+                        unset($attributes[$attrKey]);
+                    }
+                }
+                $tabs[] = $tab;
+            }
+            foreach ($attributes as $attr) {
+                $tabs[0]['content'] .= $this->createWidget($form, $model, $attr);
+            }
+
+            return Tabs::widget([
+                'items' => $tabs,
+            ]);
+        } else {
+            $result = '';
+            foreach ($attributes as $attribute) {
+                $result .= $this->createWidget($form, $model, $attribute);
+            }
+            return $result;
+        }
+    }
 }

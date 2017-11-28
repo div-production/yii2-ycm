@@ -2,8 +2,8 @@
 
 namespace janisto\ycm\controllers;
 
-use Yii;
 use janisto\ycm\behaviors\AccessControl;
+use Yii;
 use yii\filters\VerbFilter;
 
 class DefaultController extends Controller
@@ -21,7 +21,7 @@ class DefaultController extends Controller
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
                             return in_array(Yii::$app->user->identity->username, $this->module->admins);
-                        }
+                        },
                     ],
                 ],
             ],
@@ -43,7 +43,7 @@ class DefaultController extends Controller
     {
         return $this->render('index');
     }
-	
+
 //	public function actionLogin() {
 //		return 'Страница входа в админку';
 //	}

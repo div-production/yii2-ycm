@@ -1,7 +1,5 @@
 <?php
 
-use yii\helpers\Html;
-
 /* @var $this \yii\web\View */
 /* @var $model \yii\db\ActiveRecord */
 /* @var $name string */
@@ -9,11 +7,10 @@ use yii\helpers\Html;
 /** @var $module \janisto\ycm\Module */
 $module = Yii::$app->controller->module;
 
-if(!empty($model->name)) {
-	$this->title = $model->name;
-}
-else {
-	$this->title = Yii::t('ycm', 'Update {name}', ['name' => $module->getSingularName($name)]);
+if (!empty($model->name)) {
+    $this->title = $model->name;
+} else {
+    $this->title = Yii::t('ycm', 'Update {name}', ['name' => $module->getSingularName($name)]);
 }
 
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('ycm', 'Content'), 'url' => ['index']];

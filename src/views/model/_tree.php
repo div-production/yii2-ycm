@@ -17,16 +17,16 @@ $config = [
         'name',
         'id',
         [
-			'class' => 'yii\grid\ActionColumn',
-			'template' => '{update} {delete}',
-			'urlCreator' => function ($action, $model, $key, $index) use ($name) {
-                return Url::to(['model/'.$action, 'name' => $name, 'pk' => $key]);
-            }
-		],
-    ]
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{update} {delete}',
+            'urlCreator' => function ($action, $model, $key, $index) use ($name) {
+                return Url::to(['model/' . $action, 'name' => $name, 'pk' => $key]);
+            },
+        ],
+    ],
 ];
 
-if(method_exists($model, 'treeConfig')) {
+if (method_exists($model, 'treeConfig')) {
     $config = array_merge($config, $model->treeConfig());
 }
 ?>

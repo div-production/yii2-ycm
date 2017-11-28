@@ -8,7 +8,8 @@ use yii\web\AssetBundle;
  *
  * @author Leandro Gehlen <leandrogehlen@gmail.com>
  */
-class TreeGridAsset extends AssetBundle {
+class TreeGridAsset extends AssetBundle
+{
 
     public $sourcePath = '@ycm/assets';
 
@@ -21,9 +22,9 @@ class TreeGridAsset extends AssetBundle {
     ];
 
     public $depends = [
-        'yii\web\JqueryAsset'
+        'yii\web\JqueryAsset',
     ];
-    
+
     public $publishOptions = [
         // 'forceCopy' => true
     ];

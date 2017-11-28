@@ -7,8 +7,8 @@
 
 namespace janisto\ycm\widgets\SortableGrid;
 
-use yii\helpers\Url;
 use yii\grid\GridView;
+use yii\helpers\Url;
 
 /**
  * Sortable version of Yii2 GridView widget.
@@ -20,8 +20,8 @@ class Widget extends GridView
 {
     /** @var string|array Sort action */
     public $sortableAction = ['sort'];
-	
-	public $model;
+
+    public $model;
 
     public function init()
     {
@@ -32,14 +32,14 @@ class Widget extends GridView
     public function run()
     {
         $this->registerWidget();
-		
+
         parent::run();
     }
 
     protected function registerWidget()
     {
         $view = $this->getView();
-		$model = addslashes(get_class($this->model));
+        $model = addslashes(get_class($this->model));
         $view->registerJs("jQuery('#{$this->options['id']}').SortableGridView('{$this->sortableAction}', '{$model}');");
         SortableGridAsset::register($view);
     }

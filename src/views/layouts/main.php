@@ -1,9 +1,8 @@
 <?php
 
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Html;
 use yii\widgets\Breadcrumbs;
 
 /* @var $this \yii\web\View */
@@ -43,9 +42,11 @@ echo Nav::widget([
     'items' => [
         Yii::$app->user->isGuest ?
             ['label' => Yii::t('ycm', 'Login'), 'url' => ['/site/login']] :
-            ['label' => Yii::t('ycm', 'Logout ({username})', ['username' => Yii::$app->user->identity->username]),
+            [
+                'label' => Yii::t('ycm', 'Logout ({username})', ['username' => Yii::$app->user->identity->username]),
                 'url' => '/admin/logout',
-                'linkOptions' => ['data-method' => 'post']],
+                'linkOptions' => ['data-method' => 'post'],
+            ],
     ],
 ]);
 NavBar::end();

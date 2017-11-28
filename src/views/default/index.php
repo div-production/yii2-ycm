@@ -19,7 +19,7 @@ $this->title = Yii::t('ycm', 'Content');
         <?php
         $download = false;
         $downloadItems = [];
-		$model = $module->loadModel($name);
+        $model = $module->loadModel($name);
         if ($module->getDownloadCsv($name)) {
             $download = true;
             array_push($downloadItems, [
@@ -41,7 +41,7 @@ $this->title = Yii::t('ycm', 'Content');
                 'url' => ['download/excel', 'name' => $name],
             ]);
         }
-		if ($module->getDownloadExcelNew($name)) {
+        if ($module->getDownloadExcelNew($name)) {
             $download = true;
             array_push($downloadItems, [
                 'label' => Yii::t('ycm', 'Excel'),
@@ -51,19 +51,21 @@ $this->title = Yii::t('ycm', 'Content');
         ?>
 
         <h3><?= $module->getAdminName($name) ?></h3>
-	
-		<?php
+
+        <?php
         if (isset($model->adminUrl)) {
             $viewUrl = $model->adminUrl;
         } else {
             $viewUrl = ['model/list', 'name' => $name];
         }
-        echo Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), $viewUrl, ['class' => 'btn btn-primary']);
+        echo Html::a(Yii::t('ycm', 'List {name}', ['name' => $module->getPluralName($name)]), $viewUrl,
+            ['class' => 'btn btn-primary']);
         ?>
 
         <?php
         if ($module->getHideCreate($name) === false) {
-            echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]), ['model/create', 'name' => $name], ['class' => 'btn btn-success']);
+            echo Html::a(Yii::t('ycm', 'Create {name}', ['name' => $module->getSingularName($name)]),
+                ['model/create', 'name' => $name], ['class' => 'btn btn-success']);
         }
         ?>
 
@@ -77,7 +79,7 @@ $this->title = Yii::t('ycm', 'Content');
                 ],
                 'options' => [
                     'class' => 'btn btn-default',
-                ]
+                ],
             ]);
         }
         ?>
