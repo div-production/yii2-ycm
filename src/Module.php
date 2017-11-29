@@ -253,7 +253,7 @@ class Module extends \yii\base\Module
     {
         $widget = $this->getAttributeWidget($model, $attribute);
         if (!$widget) {
-            return;
+            return null;
         }
         $tableSchema = $model->getTableSchema();
 
@@ -264,8 +264,11 @@ class Module extends \yii\base\Module
             case 'wysiwyg':
                 $imageUploaderUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/js/cke.image-uploader.js';
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
+                $videoEmbedUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/video-embed/plugin.js';
+                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '" . $videoEmbedUrl . "', '');");
                 $options = [
                     'widgetClass' => CKEditor::className(),
+                    'preset' => 'custom',
                     'clientOptions' => [
                         'inline' => false,
                         'toolbar' => [
@@ -283,6 +286,8 @@ class Module extends \yii\base\Module
                                     'Strike',
                                     'Subscript',
                                     'Superscript',
+                                    'FontSize',
+                                    'Blockquote',
                                     '-',
                                     'RemoveFormat',
                                 ],
@@ -296,25 +301,25 @@ class Module extends \yii\base\Module
                                     'Outdent',
                                     'Indent',
                                     '-',
-                                    'CreateDiv',
-                                    '-',
                                     'JustifyLeft',
                                     'JustifyCenter',
                                     'JustifyRight',
                                     'JustifyBlock',
                                 ],
                             ],
-                            ['name' => 'links', 'items' => ['Link', 'Unlink']],
+                            ['name' => 'links', 'items' => ['Link', 'Unlink',]],
                             [
                                 'name' => 'insert',
-                                'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe'],
+                                'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'VideoEmbed', 'Iframe', 'Smiley'],
                             ],
-                            ['name' => 'styles', 'items' => ['Format', 'FontSize']],
+                            ['name' => 'styles', 'items' => ['Format']],
                             ['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
                             ['name' => 'tools', 'items' => ['ShowBlocks']],
                             ['name' => 'about', 'items' => ['About']],
                         ],
-                        'extraPlugins' => 'imageUploader,filetools',
+                        'extraPlugins' => 'imageUploader,filetools,colorbutton,colordialog,justify,videoembed,font,smiley,iframe',
+                        'extraAllowedContent' => 'img[title]',
+                        'removeButtons' => '',
                         'uploadUrl' => Url::to([
                             'model/redactor-upload',
                             'name' => $this->getModelName($model),
