@@ -320,6 +320,7 @@ class Module extends \yii\base\Module
                         'extraPlugins' => 'imageUploader,filetools,colorbutton,colordialog,justify,videoembed,font,smiley,iframe',
                         'extraAllowedContent' => 'img[title]',
                         'removeButtons' => '',
+                        'height' => 500,
                         'uploadUrl' => Url::to([
                             'model/redactor-upload',
                             'name' => $this->getModelName($model),
