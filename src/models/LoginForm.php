@@ -5,6 +5,7 @@ namespace janisto\ycm\models;
 use Yii;
 use yii\base\Model;
 use yii\web\IdentityInterface;
+use app\models\User;
 
 /**
  * LoginForm is the model behind the login form.
