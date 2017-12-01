@@ -266,6 +266,24 @@ class Module extends \yii\base\Module
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
                 $videoEmbedUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/video-embed/plugin.js';
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '" . $videoEmbedUrl . "', '');");
+
+                $ycmAsset = new YcmAsset();
+                $ycmAsset->publish(Yii::$app->assetManager);
+
+                $smilePath = Yii::$app->assetManager->getPublishedPath('@ycm/assets') . '/img/smiles/';
+                $smileItems = scandir($smilePath);
+                $smileFiles = [];
+                $smileNames = [];
+                foreach ($smileItems as $_item) {
+                    if ($_item == '.' || $_item == '..') {
+                        continue;
+                    }
+
+                    $smileFiles[] = $_item;
+                    $_name = preg_replace('/[._].+/', '', $_item);
+                    $smileNames[] = preg_replace('/-/', ' ', $_name);
+                }
+
                 $options = [
                     'widgetClass' => CKEditor::className(),
                     'preset' => 'custom',
@@ -321,6 +339,9 @@ class Module extends \yii\base\Module
                         'extraAllowedContent' => 'img[title]',
                         'removeButtons' => '',
                         'height' => 500,
+                        'smiley_path' => Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/img/smiles/',
+                        'smiley_images' => $smileFiles,
+                        'smiley_descriptions' => $smileNames,
                         'uploadUrl' => Url::to([
                             'model/redactor-upload',
                             'name' => $this->getModelName($model),
