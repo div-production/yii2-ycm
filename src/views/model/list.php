@@ -37,7 +37,17 @@ $this->params['breadcrumbs'][] = $this->title;
         }
         ?>
     </p>
-    <?php if (!empty($model->enableAdminSort)): ?>
+    <?php if (Yii::$app->request->get('sort')): ?>
+        <?php
+        $get = Yii::$app->request->get();
+        unset($get['sort']);
+        ?>
+        <a href="?<?= http_build_query($get) ?>" class="btn btn-primary">Сбросить сортировку</a>
+        <?php if (!empty($model->enableAdminSort)): ?>
+            <p>Менять местами записи можно только при отключенной сортировке</p>
+        <?php endif ?>
+    <?php endif ?>
+    <?php if (!empty($model->enableAdminSort) && !Yii::$app->request->get('sort')): ?>
         <?php
         $config['sortableAction'] = ['sort'];
         $config['model'] = $model;
