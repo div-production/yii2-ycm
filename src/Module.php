@@ -262,10 +262,15 @@ class Module extends \yii\base\Module
                 return $this->createField($form, $model, $attribute, [], 'widget');
 
             case 'wysiwyg':
-                $imageUploaderUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/js/cke.image-uploader.js';
+                $assetsUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets');
+
+                $imageUploaderUrl = $assetsUrl . '/js/cke.image-uploader.js';
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
-                $videoEmbedUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/video-embed/plugin.js';
+                $videoEmbedUrl = $assetsUrl . '/video-embed/plugin.js';
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '" . $videoEmbedUrl . "', '');");
+
+                $imageDialogUrl = $assetsUrl . '/js/image-dialog.js';
+                Yii::$app->view->registerJs("CKEDITOR.dialog.add('image', '" . $imageDialogUrl . "');");
 
                 $ycmAsset = new YcmAsset();
                 $ycmAsset->publish(Yii::$app->assetManager);
