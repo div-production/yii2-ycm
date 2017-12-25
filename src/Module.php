@@ -341,7 +341,7 @@ class Module extends \yii\base\Module
                             ['name' => 'about', 'items' => ['About']],
                         ],
                         'extraPlugins' => 'imageUploader,filetools,colorbutton,colordialog,justify,videoembed,font,smiley,iframe',
-                        'extraAllowedContent' => 'img[title]',
+                        'extraAllowedContent' => 'img[title]; div; *(*)',
                         'removeButtons' => '',
                         'height' => 500,
                         'smiley_path' => Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/img/smiles/',
