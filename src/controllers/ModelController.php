@@ -124,7 +124,7 @@ class ModelController extends Controller
                 $model->file->name = md5($attribute . time() . uniqid(rand(), true)) . '.' . $model->file->extension;
             }
             $path = $attributePath . DIRECTORY_SEPARATOR . $model->file->name;
-            if ($model->file->saveAs($path)) {
+            if ($this->saveFile($model->file, $path)) {
                 $result = ['url' => $module->getAttributeUrl($name, $attribute, $model->file->name)];
                 $result['fileName'] = $model->file->name;
                 $result['uploaded'] = 1;
