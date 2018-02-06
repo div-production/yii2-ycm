@@ -109,9 +109,9 @@ class Module extends \yii\base\Module
 
     /** @var array Redactor image upload validation rules. */
     public $redactorImageUploadOptions = [
-        'maxWidth' => 1920,
-        'maxHeight' => 1920,
-        'maxSize' => 1048576, // 1024 * 1024 = 1MB
+        'maxWidth' => 100000,
+        'maxHeight' => 100000,
+        'maxSize' => 1024 * 1024 * 32,
     ];
 
     /** @var boolean Whether to enable redactor file uploads. */
