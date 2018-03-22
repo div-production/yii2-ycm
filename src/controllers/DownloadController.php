@@ -251,6 +251,8 @@ class DownloadController extends Controller
             throw new \Exception('You need to install phpoffice/phpexcel');
         }
 
+        Yii::$app->response->isSent = true;
+
         /** @var $module \janisto\ycm\Module */
         $module = $this->module;
         /** @var $model \yii\db\ActiveRecord */
