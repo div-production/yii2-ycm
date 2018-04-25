@@ -76,7 +76,7 @@ class Widget extends BaseWidget
                 $selected,
                 ArrayHelper::map($column, 'id', $this->nameAttribute),
                 [
-                    'separator' => '<br>',
+                    'separator' => '',
                 ]);
             $result .= '<div style="display: inline-block; vertical-align: top; width: ' . (100 / $columnsCount) . '%">' . $columnContent . '</div>';
         }
