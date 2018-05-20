@@ -58,7 +58,7 @@ class Widget extends BaseWidget
             $result = $this->createRow([]);
         }
         if ($this->showCreate) {
-            $result .= '<div class="btn btn-primary js-field-add">Добавить поле</div>';
+            $result .= '<div class="btn btn-primary js-field-add" widget_attr=' . $this->attribute . '>Добавить поле</div>';
         }
         return '<div>' . $result . '</div>';
     }
@@ -108,16 +108,17 @@ class Widget extends BaseWidget
 
     public function register()
     {
+        $view = $this->getView();
+
+        $view->registerJs(
+            'var data = $(window).data("multiFieldConfig"); if (data == null) { data = {}; } data.' . $this->attribute . ' = \'' . $this->createRow([]) . '\'; $(window).data("multiFieldConfig", data);',
+            View::POS_END
+        );
+
         if (self::$registered) {
             return;
         }
         self::$registered = true;
-        $view = $this->getView();
-
-        $view->registerJs(
-            '$(window).data("multiFieldConfig", {template: \'' . $this->createRow([]) . '\'});',
-            View::POS_END
-        );
 
         Asset::register($this->getView());
     }
