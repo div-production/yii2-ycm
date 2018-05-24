@@ -14,9 +14,11 @@ class LoginController extends Controller
             return $this->goHome();
         }
 
+        $module = $this->module;
+
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect('/admin');
+            return $this->redirect(['/' . $module->urlPrefix]);
         }
         return $this->render('index', [
             'model' => $model,

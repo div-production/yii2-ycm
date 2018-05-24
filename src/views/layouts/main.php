@@ -44,7 +44,7 @@ echo Nav::widget([
             ['label' => Yii::t('ycm', 'Login'), 'url' => ['/site/login']] :
             [
                 'label' => Yii::t('ycm', 'Logout ({username})', ['username' => Yii::$app->user->identity->username]),
-                'url' => '/admin/logout',
+                'url' => ['/admin/logout'],
                 'linkOptions' => ['data-method' => 'post'],
             ],
     ],
