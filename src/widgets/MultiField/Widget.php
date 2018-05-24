@@ -85,18 +85,20 @@ class Widget extends BaseWidget
             ];
             if (isset($data[$field['name']])) {
                 $options['value'] = $data[$field['name']];
-            } else {
-                $options['value'] = '';
+                unset($field['name']);
             }
             if (isset($field['hint'])) {
                 $options['placeholder'] = $field['hint'];
+                unset($field['hint']);
             }
-
             if (isset($field['type'])) {
                 $type = $field['type'];
+                unset($field['hint']);
             } else {
                 $type = 'text';
             }
+
+            $options = array_merge($options, $field);
 
             $r .= Html::activeInput($type, $this->model, $name, $options);
         }
