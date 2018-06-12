@@ -98,8 +98,11 @@ class Module extends \yii\base\Module
     /** @var string Upload URL. */
     public $uploadUrl;
 
+    /** @var string Url for save files to FTP. */
+    public $ftpUploadPath;
+
     /** @var integer Upload permissions for folders. */
-    public $uploadPermissions = 0775;
+    public $uploadPermissions = 0755;
 
     /** @var boolean Whether to delete the temporary uploaded file after saving. */
     public $uploadDeleteTempFile = true;
@@ -122,6 +125,10 @@ class Module extends \yii\base\Module
         'maxSize' => 8388608, // 1024 * 1024 * 8 = 8MB
     ];
 
+    public $uploadToServer = true;
+
+    public $uploadToFtp = false;
+
     /** @var integer Number of columns to show in model/list view by default. */
     public $maxColumns = 8;
 
@@ -142,8 +149,8 @@ class Module extends \yii\base\Module
 
         if ($this->uploadPath === null) {
             $this->uploadPath = Yii::getAlias('@uploadPath');
-            if (!is_writable($this->uploadPath)) {
-                throw new InvalidConfigException('Make sure "uploads" folder is writable.');
+            if (!is_dir($this->uploadPath)) {
+                mkdir($this->uploadPath, $this->uploadPermissions, true);
             }
         }
 
@@ -166,7 +173,7 @@ class Module extends \yii\base\Module
 
             if (is_subclass_of($model, 'yii\db\ActiveRecord')) {
                 $this->models[$name] = $model;
-                $this->modelPaths[$name] = $this->uploadPath . DIRECTORY_SEPARATOR . $folder;
+                $this->modelPaths[$name] = $folder;
                 $this->modelUrls[$name] = $this->uploadUrl . '/' . $folder;
             }
 
@@ -1049,5 +1056,19 @@ class Module extends \yii\base\Module
             }
             return $result;
         }
+    }
+
+    public function getUploadPaths()
+    {
+        $paths = [];
+
+        if ($this->uploadToServer) {
+            $paths[] = $this->uploadPath;
+        }
+        if ($this->uploadToFtp) {
+            $paths[] = $this->ftpUploadPath;
+        }
+
+        return $paths;
     }
 }

@@ -17,7 +17,6 @@ class Behavior extends \yii\base\Behavior
         return [
             $owner_class::EVENT_AFTER_INSERT => 'saveFiles',
             $owner_class::EVENT_AFTER_UPDATE => 'saveFiles',
-            $owner_class::EVENT_BEFORE_DELETE => 'removeFiles',
         ];
     }
 

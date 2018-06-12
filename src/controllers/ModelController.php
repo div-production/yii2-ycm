@@ -107,11 +107,6 @@ class ModelController extends Controller
             $validatorOptions = $module->redactorFileUploadOptions;
         }
         $attributePath = $module->getAttributePath($name, $attribute);
-        if (!is_dir($attributePath)) {
-            if (!FileHelper::createDirectory($attributePath, $module->uploadPermissions)) {
-                throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
-            }
-        }
         $file = UploadedFile::getInstanceByName('upload');
         $model = new DynamicModel(compact('file'));
         $model->addRule('file', $uploadType, $validatorOptions)->validate();
@@ -335,11 +330,6 @@ class ModelController extends Controller
                         $model->$attribute = $file;
                         if ($model->validate()) {
                             $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
-                            if (!is_dir($attributePath)) {
-                                if (!FileHelper::createDirectory($attributePath, $module->uploadPermissions)) {
-                                    throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
-                                }
-                            }
                             $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
                             if (file_exists($path) || !$this->saveFile($file, $path)) {
                                 throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
@@ -362,11 +352,9 @@ class ModelController extends Controller
                 }
             } elseif (count($filePaths) > 0) {
                 foreach ($filePaths as $path) {
-                    if (file_exists($path)) {
-                        // Save failed - delete files.
-                        if (@unlink($path) === false) {
-                            throw new ServerErrorHttpException('Could not delete file: ' . $path);
-                        }
+                    // Save failed - delete files.
+                    if (!$this->deleteFile($path)) {
+                        throw new ServerErrorHttpException('Could not delete file: ' . $path);
                     }
                 }
             }
@@ -411,10 +399,8 @@ class ModelController extends Controller
                     $delete = (isset($postData[$className][$attribute . '_delete']));
                     if ($delete) {
                         $path = $attributePath . DIRECTORY_SEPARATOR . $model->getOldAttribute($attribute);
-                        if (file_exists($path)) {
-                            if (@unlink($path) === false) {
-                                throw new ServerErrorHttpException('Could not delete file: ' . $path);
-                            }
+                        if (!$this->deleteFile($path)) {
+                            throw new ServerErrorHttpException('Could not delete file: ' . $path);
                         }
                         $model->$attribute = '';
                     } else {
@@ -423,11 +409,6 @@ class ModelController extends Controller
                             $model->$attribute = $file;
                             if ($model->validate()) {
                                 $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
-                                if (!is_dir($attributePath)) {
-                                    if (!FileHelper::createDirectory($attributePath, $module->uploadPermissions)) {
-                                        throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
-                                    }
-                                }
                                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
                                 if (file_exists($path) || !$this->saveFile($file, $path)) {
                                     throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
@@ -457,11 +438,9 @@ class ModelController extends Controller
                 }
             } elseif (count($filePaths) > 0) {
                 foreach ($filePaths as $path) {
-                    if (file_exists($path)) {
-                        // Save failed - delete files.
-                        if (@unlink($path) === false) {
-                            throw new ServerErrorHttpException('Could not delete file: ' . $path);
-                        }
+                    // Save failed - delete files.
+                    if (!$this->deleteFile($path)) {
+                        throw new ServerErrorHttpException('Could not delete file: ' . $path);
                     }
                 }
             }
@@ -514,17 +493,54 @@ class ModelController extends Controller
 
     protected function saveFile(UploadedFile $file, $path)
     {
+        /** @var \janisto\ycm\Module $module */
         $module = $this->module;
 
-        if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
-            Image::thumbnail($file->tempName, 1900, null)->save($path, [
-                'quality' => 70,
-            ]);
-        } else {
-            $file->saveAs($path);
+        $results = [];
+        foreach ($module->getUploadPaths() as $uploadPath) {
+            $savePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
+            if (file_exists($savePath)) {
+                $results[] = false;
+                continue;
+            }
+            $saveDir = dirname($savePath);
+            if (!is_dir($saveDir)) {
+                @mkdir($saveDir, $module->uploadPermissions, true);
+            }
+
+            if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
+                try {
+                    Image::thumbnail($file->tempName, 1900, null)->save($savePath, [
+                        'quality' => 70,
+                    ]);
+                    $results[] = true;
+                } catch (\Exception $e) {
+                    $results[] = false;
+                }
+
+            } else {
+                $results[] = $file->saveAs($path);
+            }
         }
 
-        return true;
+        return array_search(false, $results) === false;
+    }
+
+    protected function deleteFile($path)
+    {
+        /** @var \janisto\ycm\Module $module */
+        $module = $this->module;
+        $results = [];
+        foreach ($module->getUploadPaths() as $uploadPath) {
+            $deletePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
+            if (file_exists($deletePath)) {
+                $results[] = @unlink($deletePath);
+            } else {
+                $results[] = false;
+            }
+        }
+
+        return array_search(false, $results) === false;
     }
 
     public function redirect($url, $statusCode = 302)
