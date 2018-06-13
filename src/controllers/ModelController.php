@@ -332,7 +332,11 @@ class ModelController extends Controller
                             $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
                             $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
                             if (file_exists($path) || !$this->saveFile($file, $path)) {
-                                throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
+                                Yii::$app->session->setFlash('error', 'Не удалось сохранить файл на сервер');
+                                return $this->render('create', [
+                                    'model' => $model,
+                                    'name' => $name,
+                                ]);
                             }
                             array_push($filePaths, $path);
                             $model->$attribute = $fileName;
@@ -349,13 +353,6 @@ class ModelController extends Controller
                     return $this->redirect(['update', 'name' => $name, 'pk' => $model->primaryKey]);
                 } else {
                     return $this->redirect(['list', 'name' => $name]);
-                }
-            } elseif (count($filePaths) > 0) {
-                foreach ($filePaths as $path) {
-                    // Save failed - delete files.
-                    if (!$this->deleteFile($path)) {
-                        throw new ServerErrorHttpException('Could not delete file: ' . $path);
-                    }
                 }
             }
         } elseif (Yii::$app->request->method == 'POST' && $demo) {
@@ -400,7 +397,11 @@ class ModelController extends Controller
                     if ($delete) {
                         $path = $attributePath . DIRECTORY_SEPARATOR . $model->getOldAttribute($attribute);
                         if (!$this->deleteFile($path)) {
-                            throw new ServerErrorHttpException('Could not delete file: ' . $path);
+                             Yii::$app->session->setFlash('error', 'Не удалось удалить файл с сервера');
+                            return $this->render('update', [
+                                'model' => $model,
+                                'name' => $name,
+                            ]);
                         }
                         $model->$attribute = '';
                     } else {
@@ -411,7 +412,11 @@ class ModelController extends Controller
                                 $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
                                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
                                 if (file_exists($path) || !$this->saveFile($file, $path)) {
-                                    throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
+                                    Yii::$app->session->setFlash('error', 'Не удалось сохранить файл на сервер');
+                                    return $this->render('create', [
+                                        'model' => $model,
+                                        'name' => $name,
+                                    ]);
                                 }
                                 array_push($filePaths, $path);
                                 $model->$attribute = $fileName;
@@ -434,13 +439,6 @@ class ModelController extends Controller
                         return $this->redirect(Yii::$app->session['last_list_url']);
                     } else {
                         return $this->redirect(['list', 'name' => $name]);
-                    }
-                }
-            } elseif (count($filePaths) > 0) {
-                foreach ($filePaths as $path) {
-                    // Save failed - delete files.
-                    if (!$this->deleteFile($path)) {
-                        throw new ServerErrorHttpException('Could not delete file: ' . $path);
                     }
                 }
             }
