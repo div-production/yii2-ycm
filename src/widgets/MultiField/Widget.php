@@ -83,8 +83,11 @@ class Widget extends BaseWidget
                 'class' => 'form-control',
                 'style' => "width: $width%; display: inline-block; margin-right: 2%;",
             ];
-            if (isset($data[$field['name']])) {
-                $options['value'] = $data[$field['name']];
+
+            if (isset($field['name'])) {
+                if (isset($data[$field['name']])) {
+                    $options['value'] = $data[$field['name']];
+                }
                 unset($field['name']);
             }
             if (isset($field['hint'])) {
@@ -93,7 +96,7 @@ class Widget extends BaseWidget
             }
             if (isset($field['type'])) {
                 $type = $field['type'];
-                unset($field['hint']);
+                unset($field['type']);
             } else {
                 $type = 'text';
             }
@@ -113,7 +116,7 @@ class Widget extends BaseWidget
         $view = $this->getView();
 
         $view->registerJs(
-            'var data = $(window).data("multiFieldConfig"); if (data == null) { data = {}; } data.' . $this->attribute . ' = \'' . $this->createRow([]) . '\'; $(window).data("multiFieldConfig", data);',
+            'var data = $(window).data("multiFieldConfig"); if (data == null) { data = {}; } data.' . $this->attribute . ' = \'' . addslashes($this->createRow([])) . '\'; $(window).data("multiFieldConfig", data);',
             View::POS_END
         );
 
