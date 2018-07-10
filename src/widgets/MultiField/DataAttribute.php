@@ -17,7 +17,7 @@ class DataAttribute extends Object
 
         if (is_array($data)) {
             return $data;
-        } elseif (is_string($data)) {
+        } elseif (is_string($data) && $data) {
             return unserialize($data);
         } else {
             return [];
