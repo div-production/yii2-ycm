@@ -84,7 +84,7 @@ class Behavior extends \yii\base\Behavior
                 foreach ($images as $img) {
                     $save = false;
                     if (in_array($img->id, $data[$attribute . '__remove'])) {
-                        unlink($attributePath . DIRECTORY_SEPARATOR . $img->image);
+                        $module->deleteFile($attributePath . DIRECTORY_SEPARATOR . $img->image);
                         $img->delete();
                         continue;
                     }
