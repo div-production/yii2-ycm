@@ -10,11 +10,9 @@ use yii\base\DynamicModel;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
-use yii\helpers\FileHelper;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
-use yii\imagine\Image;
 use yii\validators\BooleanValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
@@ -119,7 +117,7 @@ class ModelController extends Controller
                 $model->file->name = md5($attribute . time() . uniqid(rand(), true)) . '.' . $model->file->extension;
             }
             $path = $attributePath . DIRECTORY_SEPARATOR . $model->file->name;
-            if ($this->saveFile($model->file, $path)) {
+            if ($module->saveFile($model->file, $path)) {
                 $result = ['url' => $module->getAttributeUrl($name, $attribute, $model->file->name)];
                 $result['fileName'] = $model->file->name;
                 $result['uploaded'] = 1;
@@ -331,7 +329,7 @@ class ModelController extends Controller
                         if ($model->validate()) {
                             $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
                             $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                            if (file_exists($path) || !$this->saveFile($file, $path)) {
+                            if (file_exists($path) || !$module->saveFile($file, $path)) {
                                 Yii::$app->session->setFlash('error', 'Не удалось сохранить файл на сервер');
                                 return $this->render('create', [
                                     'model' => $model,
@@ -396,7 +394,7 @@ class ModelController extends Controller
                     $delete = (isset($postData[$className][$attribute . '_delete']));
                     if ($delete) {
                         $path = $attributePath . DIRECTORY_SEPARATOR . $model->getOldAttribute($attribute);
-                        if (!$this->deleteFile($path)) {
+                        if (!$module->deleteFile($path)) {
                              Yii::$app->session->setFlash('error', 'Не удалось удалить файл с сервера');
                             return $this->render('update', [
                                 'model' => $model,
@@ -411,7 +409,7 @@ class ModelController extends Controller
                             if ($model->validate()) {
                                 $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
                                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
-                                if (file_exists($path) || !$this->saveFile($file, $path)) {
+                                if (file_exists($path) || !$module->saveFile($file, $path)) {
                                     Yii::$app->session->setFlash('error', 'Не удалось сохранить файл на сервер');
                                     return $this->render('create', [
                                         'model' => $model,
@@ -487,58 +485,6 @@ class ModelController extends Controller
             return false;
         }
         return $this->renderPartial('_tree', ['model' => $model]);
-    }
-
-    protected function saveFile(UploadedFile $file, $path)
-    {
-        /** @var \janisto\ycm\Module $module */
-        $module = $this->module;
-
-        $results = [];
-        foreach ($module->getUploadPaths() as $uploadPath) {
-            $savePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
-            if (file_exists($savePath)) {
-                $results[] = false;
-                continue;
-            }
-            $saveDir = dirname($savePath);
-            if (!is_dir($saveDir)) {
-                @mkdir($saveDir, $module->uploadPermissions, true);
-            }
-
-            if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
-                try {
-                    Image::thumbnail($file->tempName, 1900, null)->save($savePath, [
-                        'quality' => 70,
-                    ]);
-                    $results[] = true;
-                } catch (\Exception $e) {
-                    $results[] = false;
-                }
-
-            } else {
-                $results[] = $file->saveAs($path);
-            }
-        }
-
-        return array_search(false, $results) === false;
-    }
-
-    protected function deleteFile($path)
-    {
-        /** @var \janisto\ycm\Module $module */
-        $module = $this->module;
-        $results = [];
-        foreach ($module->getUploadPaths() as $uploadPath) {
-            $deletePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
-            if (file_exists($deletePath)) {
-                $results[] = @unlink($deletePath);
-            } else {
-                $results[] = false;
-            }
-        }
-
-        return array_search(false, $results) === false;
     }
 
     public function redirect($url, $statusCode = 302)

@@ -52,7 +52,7 @@ class Behavior extends \yii\base\Behavior
                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
 
                 try {
-                    Imagine::thumbnail($file->tempName, 1920, null)->save($path);
+                    $module->saveFile($file, $path);
                 } catch (\Exception $e) {
                     throw new ServerErrorHttpException('Could not save file or file exists: ' . $path);
                 }

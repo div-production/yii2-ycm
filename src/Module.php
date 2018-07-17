@@ -15,7 +15,9 @@ use yii\helpers\Html;
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 use yii\helpers\Url;
+use yii\imagine\Image;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
 
 /**
  * Main module class for yii2-ycm.
@@ -1070,5 +1072,52 @@ class Module extends \yii\base\Module
         }
 
         return $paths;
+    }
+
+    public function saveFile(UploadedFile $file, $path)
+    {
+        $results = [];
+        foreach ($this->getUploadPaths() as $uploadPath) {
+            $savePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
+            if (file_exists($savePath)) {
+                $results[] = false;
+                continue;
+            }
+            $saveDir = dirname($savePath);
+            if (!is_dir($saveDir)) {
+                @mkdir($saveDir, $this->uploadPermissions, true);
+            }
+
+            if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
+                try {
+                    Image::thumbnail($file->tempName, 1920, null)->save($savePath, [
+                        'quality' => 70,
+                    ]);
+                    $results[] = true;
+                } catch (\Exception $e) {
+                    $results[] = false;
+                }
+
+            } else {
+                $results[] = $file->saveAs($path);
+            }
+        }
+
+        return array_search(false, $results) === false;
+    }
+
+    public function deleteFile($path)
+    {
+        $results = [];
+        foreach ($this->getUploadPaths() as $uploadPath) {
+            $deletePath = $uploadPath . DIRECTORY_SEPARATOR . $path;
+            if (file_exists($deletePath)) {
+                $results[] = @unlink($deletePath);
+            } else {
+                $results[] = false;
+            }
+        }
+
+        return array_search(false, $results) === false;
     }
 }
