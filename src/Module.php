@@ -213,7 +213,8 @@ class Module extends \yii\base\Module
     public function getModelName($model)
     {
         foreach ($this->models as $name => $class) {
-            if (get_class($class) === $model->className()) {
+            $className = $model->className();
+            if (get_class($class) === $className || is_subclass_of($class, $className)) {
                 return $name;
             }
         }
