@@ -1100,7 +1100,7 @@ class Module extends \yii\base\Module
                 }
 
             } else {
-                $results[] = $file->saveAs($path);
+                $results[] = $file->saveAs($savePath);
             }
         }
 
