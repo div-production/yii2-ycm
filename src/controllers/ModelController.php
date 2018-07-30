@@ -220,7 +220,7 @@ class ModelController extends Controller
         //array_unshift($columns, ['class' => 'yii\grid\SerialColumn']);
         array_push($columns, [
             'class' => 'yii\grid\ActionColumn',
-            'template' => '{update} {delete}',
+            'template' => '{update} {delete} {copy}',
             'buttons' => [
                 'update' => function ($url, $model, $key) {
                     /** @var $module \janisto\ycm\Module */
@@ -245,6 +245,17 @@ class ModelController extends Controller
                         ]);
                     }
                 },
+                'copy' => function ($url, $model, $key) {
+                    /** @var $module \janisto\ycm\Module */
+                    $module = $this->module;
+                    if ($module->getAllowCopy($model) !== false) {
+                        return Html::a('<span class="glyphicon glyphicon-copy"></span>', ['/ycm/model/create', 'name' => Yii::$app->request->get('name'), 'copy_id' => $model->id], [
+                            'title' => Yii::t('ycm', 'Copy'),
+                            'data-pjax' => '0',
+                        ]);
+                    }
+
+                }
             ],
             'urlCreator' => function ($action, $model, $key, $index) {
                 $name = Yii::$app->getRequest()->getQueryParam('name');
@@ -307,7 +318,7 @@ class ModelController extends Controller
      * @throws ServerErrorHttpException
      * @throws \yii\web\NotFoundHttpException
      */
-    public function actionCreate($name)
+    public function actionCreate($name, $copy_id = null)
     {
         /** @var $module \janisto\ycm\Module */
         $module = $this->module;
@@ -353,8 +364,16 @@ class ModelController extends Controller
                     return $this->redirect(['list', 'name' => $name]);
                 }
             }
-        } elseif (Yii::$app->request->method == 'POST' && $demo) {
+        } elseif (Yii::$app->request->isPost && $demo) {
             Yii::$app->session->setFlash('danger', Yii::t('ycm', 'You can\'t create entries in demo mode'));
+        } elseif (Yii::$app->request->isGet && $copy_id) {
+            $copyModel = $model::findOne($copy_id);
+            if ($copyModel) {
+                $model->setAttributes($copyModel->attributes, false);
+                $model->id = null;
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('ycm', 'Entry for copy not found'));
+            }
         }
 
         return $this->render('create', [

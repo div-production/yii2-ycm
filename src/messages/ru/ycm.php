@@ -40,6 +40,7 @@ return [
     'Save and add another' => 'Сохранить и добавить новый',
     'Save and continue editing' => 'Сохранить',
     'Update' => 'Ок',
+    'Copy' => 'Скопировать',
     'Update {name}' => '{name}',
     '{name} has been created.' => 'Запись <b>{name}</b> создана.',
     '{name} has been deleted.' => 'Запись <b>{name}</b> удалена.',
@@ -47,4 +48,5 @@ return [
     'You can\'t create entries in demo mode' => 'Вы не можете создавать записи в демо режиме',
     'You can\'t edit entries in demo mode' => 'Вы не можете редактировать записи в демо режиме',
     'You can\'t delete entries in demo mode' => 'Вы не можете удалять записи в демо режиме',
+    'Entry for copy not found' => 'Запись для копирования не найдена',
 ];

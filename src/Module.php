@@ -992,6 +992,18 @@ class Module extends \yii\base\Module
         }
     }
 
+    public function getAllowCopy($model)
+    {
+        if (is_string($model)) {
+            $model = $this->loadModel($model);
+        }
+        if (isset($model->allowCopy)) {
+            return $model->allowCopy;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Get excluded download fields.
      *
