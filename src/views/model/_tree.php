@@ -2,10 +2,13 @@
 use janisto\ycm\widgets\TreeGrid\Widget as TreeGrid;
 use yii\helpers\Url;
 
+/* @var $this \yii\web\View */
+/* @var $config array */
+
 $module = Yii::$app->controller->module;
 $name = $module->getModelName($model);
 
-$config = [
+$treeConfig = [
     'model' => $model,
     'keyColumnName' => 'id',
     'parentColumnName' => 'parent_id',
@@ -13,21 +16,11 @@ $config = [
     'pluginOptions' => [
         'initialState' => 'collapsed',
     ],
-    'columns' => [
-        'name',
-        'id',
-        [
-            'class' => 'yii\grid\ActionColumn',
-            'template' => '{update} {delete}',
-            'urlCreator' => function ($action, $model, $key, $index) use ($name) {
-                return Url::to(['model/' . $action, 'name' => $name, 'pk' => $key]);
-            },
-        ],
-    ],
+    'columns' => isset($config['columns']) ? $config['columns'] : [],
 ];
 
 if (method_exists($model, 'treeConfig')) {
-    $config = array_merge($config, $model->treeConfig());
+    $treeConfig = array_merge($treeConfig, $model->treeConfig());
 }
 ?>
-<?= TreeGrid::widget($config) ?>
+<?= TreeGrid::widget($treeConfig) ?>

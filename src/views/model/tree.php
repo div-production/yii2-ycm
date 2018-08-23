@@ -1,5 +1,11 @@
 <?php
+
 use yii\helpers\Html;
+
+/* @var $this \yii\web\View */
+/* @var $config array */
+/* @var $model \yii\db\ActiveRecord */
+/* @var $name string */
 
 $module = Yii::$app->controller->module;
 
@@ -21,4 +27,4 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     ?>
 </p>
-<?= $this->render('_tree', ['model' => $model]) ?>
+<?= $this->render('_tree', ['model' => $model, 'config' => $config]) ?>
