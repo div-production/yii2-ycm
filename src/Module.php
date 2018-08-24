@@ -134,6 +134,10 @@ class Module extends \yii\base\Module
     /** @var integer Number of columns to show in model/list view by default. */
     public $maxColumns = 8;
 
+    public $ckeWidgets = [];
+
+    public $ckeContentsCss;
+
     protected $attributeWidgets;
 
     /**
@@ -275,12 +279,12 @@ class Module extends \yii\base\Module
                 $assetsUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets');
 
                 $imageUploaderUrl = $assetsUrl . '/js/cke.image-uploader.js';
-                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '" . $imageUploaderUrl . "', '');");
+                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '$imageUploaderUrl', '');");
                 $videoEmbedUrl = $assetsUrl . '/video-embed/plugin.js';
-                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '" . $videoEmbedUrl . "', '');");
+                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '$videoEmbedUrl', '');");
 
                 $imageDialogUrl = $assetsUrl . '/js/image-dialog.js';
-                Yii::$app->view->registerJs("CKEDITOR.dialog.add('image', '" . $imageDialogUrl . "');");
+                Yii::$app->view->registerJs("CKEDITOR.dialog.add('image', '$imageDialogUrl');");
 
                 $ycmAsset = new YcmAsset();
                 $ycmAsset->publish(Yii::$app->assetManager);
@@ -297,6 +301,31 @@ class Module extends \yii\base\Module
                     $smileFiles[] = $_item;
                     $_name = preg_replace('/[._].+/', '', $_item);
                     $smileNames[] = preg_replace('/-/', ' ', $_name);
+                }
+
+                $extraPlugins = ['imageUploader', 'filetools', 'colorbutton', 'colordialog', 'justify', 'videoembed', 'font', 'smiley', 'iframe'];
+                $widgetButtons = [];
+                if ($this->ckeWidgets) {
+                    $extraPlugins[] = 'widget';
+
+                    $dropdownUrl = $assetsUrl . '/dropdown-toolbar/plugin.js';
+                    Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('dropdown-toolbar', '$dropdownUrl', '');");
+                    $extraPlugins[] = 'dropdown-toolbar';
+
+                    foreach ($this->ckeWidgets as $widget) {
+                        Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('$widget[name]', '" . Yii::getAlias($widget['url']) . "', '');");
+                        $extraPlugins[] = $widget['name'];
+                        $widgetButtons[] = [
+                            'name' => $widget['name'],
+                            'command' => $widget['name'],
+                            'label' => $widget['label'],
+                        ];
+                    }
+                }
+
+                $contentsCss = [$assetsUrl . '/css/cke-contents.css'];
+                if ($this->ckeContentsCss) {
+                    $contentsCss[] = Yii::getAlias($this->ckeContentsCss);
                 }
 
                 $options = [
@@ -349,8 +378,9 @@ class Module extends \yii\base\Module
                             ['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
                             ['name' => 'tools', 'items' => ['ShowBlocks']],
                             ['name' => 'about', 'items' => ['About']],
+                            ['Widgets'],
                         ],
-                        'extraPlugins' => 'imageUploader,filetools,colorbutton,colordialog,justify,videoembed,font,smiley,iframe',
+                        'extraPlugins' => implode(',', $extraPlugins),
                         'extraAllowedContent' => 'img[title]; div; *(*)',
                         'removeButtons' => '',
                         'height' => 500,
@@ -362,34 +392,18 @@ class Module extends \yii\base\Module
                             'name' => $this->getModelName($model),
                             'attr' => $attribute,
                         ]),
+                        'dropdownmenumanager' => [
+                            'Widgets' => [
+                                'items' => $widgetButtons,
+                                'label' => [
+                                    'text' => 'Виджеты',
+                                    'width' => 80,
+                                ],
+                            ],
+                        ],
+                        'contentsCss' => $contentsCss,
                     ],
                 ];
-                /*if ($this->redactorImageUpload === true) {
-                    $imageOptions =  [
-                        'settings' => [
-                            'imageManagerJson' => Url::to(['model/redactor-list', 'name' => $this->getModelName($model), 'attr' => $attribute]),
-                            'imageUpload' => Url::to(['model/redactor-upload', 'name' => $this->getModelName($model), 'attr' => $attribute]),
-                            'imageUploadErrorCallback' => new JsExpression('function(json) { alert(json.error); }'),
-                            'plugins' => [
-                                'imagemanager',
-                            ],
-                        ]
-                    ];
-                    $options = ArrayHelper::merge($options, $imageOptions);
-                }
-                if ($this->redactorFileUpload === true) {
-                    $fileOptions =  [
-                        'settings' => [
-                            'fileManagerJson' => Url::to(['model/redactor-list', 'name' => $this->getModelName($model), 'attr' => $attribute, 'type' => 'file']),
-                            'fileUpload' => Url::to(['model/redactor-upload', 'name' => $this->getModelName($model), 'attr' => $attribute, 'type' => 'file']),
-                            'fileUploadErrorCallback' => new JsExpression('function(json) { alert(json.error); }'),
-                            'plugins' => [
-                                'filemanager',
-                            ],
-                        ]
-                    ];
-                    $options = ArrayHelper::merge($options, $fileOptions);
-                }*/
                 return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'date':
