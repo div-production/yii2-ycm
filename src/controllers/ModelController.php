@@ -361,7 +361,7 @@ class ModelController extends Controller
                 } elseif (Yii::$app->request->post('_continue')) {
                     return $this->redirect(['update', 'name' => $name, 'pk' => $model->primaryKey]);
                 } else {
-                    return $this->redirect(['list', 'name' => $name]);
+                    return $this->redirect($module->getListUrl($model));
                 }
             }
         } elseif (Yii::$app->request->isPost && $demo) {
@@ -452,11 +452,7 @@ class ModelController extends Controller
                 } elseif (Yii::$app->request->post('_continue')) {
                     return $this->redirect(['update', 'name' => $name, 'pk' => $model->primaryKey]);
                 } else {
-                    if (isset(Yii::$app->session['last_list_url'])) {
-                        return $this->redirect(Yii::$app->session['last_list_url']);
-                    } else {
-                        return $this->redirect(['list', 'name' => $name]);
-                    }
+                    return $this->redirect($module->getListUrl($model));
                 }
             }
         } elseif (Yii::$app->request->method == 'POST' && $demo) {
@@ -493,7 +489,7 @@ class ModelController extends Controller
                 Yii::t('ycm', 'Could not delete {name}.', ['name' => $module->getSingularName($name)]));
         }
 
-        return $this->redirect(['list', 'name' => $name]);
+        return $this->redirect($module->getListUrl($model));
     }
 
     public function actionGetTree()

@@ -14,7 +14,7 @@ if (!empty($model->name)) {
 }
 
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('ycm', 'Content'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $module->getAdminName($model), 'url' => ['list', 'name' => $name]];
+$this->params['breadcrumbs'][] = ['label' => $module->getAdminName($model), 'url' => $module->getListUrl($model)];
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>

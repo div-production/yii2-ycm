@@ -173,10 +173,6 @@ class Module extends \yii\base\Module
             }
             $model = Yii::createObject($class);
 
-            if ($this->getHideList($model)) {
-                continue;
-            }
-
             if (is_subclass_of($model, 'yii\db\ActiveRecord')) {
                 $this->models[$name] = $model;
                 $this->modelPaths[$name] = $folder;
@@ -187,6 +183,10 @@ class Module extends \yii\base\Module
                 $viewUrl = $model->adminUrl;
             } else {
                 $viewUrl = ['model/list', 'name' => $name];
+            }
+
+            if ($this->getHideList($model)) {
+                continue;
             }
 
             $this->sidebarItems[] = ['label' => $this->getPluralName($model), 'url' => $viewUrl];
@@ -931,6 +931,23 @@ class Module extends \yii\base\Module
             return (bool)$model->hideListAction;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * @param \yii\db\ActiveRecord $model
+     */
+    public function getListUrl($model)
+    {
+        if (method_exists($model, 'getListUrl')) {
+            return $model->getListUrl();
+        } elseif (isset(Yii::$app->session['last_list_url'])) {
+            return Yii::$app->session['last_list_url'];
+        } else {
+            return [
+                '/ycm/model/list',
+                'name' => $this->getModelName($model),
+            ];
         }
     }
 
