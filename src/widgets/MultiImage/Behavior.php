@@ -45,11 +45,6 @@ class Behavior extends \yii\base\Behavior
             $files = UploadedFile::getInstances($this->owner, $attribute);
             foreach ($files as $file) {
                 $fileName = md5($attribute . time() . uniqid(rand(), true)) . '.' . $file->extension;
-                if (!is_dir($attributePath)) {
-                    if (!FileHelper::createDirectory($attributePath, $module->uploadPermissions)) {
-                        throw new InvalidConfigException('Could not create folder "' . $attributePath . '". Make sure "uploads" folder is writable.');
-                    }
-                }
                 $path = $attributePath . DIRECTORY_SEPARATOR . $fileName;
 
                 try {
