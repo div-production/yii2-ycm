@@ -2,6 +2,7 @@
 namespace janisto\ycm\widgets\MultiImage;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\helpers\FileHelper;
 use yii\imagine\Image as Imagine;
 use yii\web\ServerErrorHttpException;
