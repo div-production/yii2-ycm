@@ -138,6 +138,8 @@ class Module extends \yii\base\Module
 
     public $ckeContentsCss;
 
+    public $enableSmiles = false;
+
     protected $attributeWidgets;
 
     /**
@@ -289,21 +291,25 @@ class Module extends \yii\base\Module
                 $ycmAsset = new YcmAsset();
                 $ycmAsset->publish(Yii::$app->assetManager);
 
-                $smilePath = Yii::$app->assetManager->getPublishedPath('@ycm/assets') . '/img/smiles/';
-                $smileItems = scandir($smilePath);
-                $smileFiles = [];
-                $smileNames = [];
-                foreach ($smileItems as $_item) {
-                    if ($_item == '.' || $_item == '..') {
-                        continue;
-                    }
+                $extraPlugins = ['imageUploader', 'filetools', 'colorbutton', 'colordialog', 'justify', 'videoembed', 'font', 'iframe'];
 
-                    $smileFiles[] = $_item;
-                    $_name = preg_replace('/[._].+/', '', $_item);
-                    $smileNames[] = preg_replace('/-/', ' ', $_name);
+                if ($this->enableSmiles) {
+                    $smilePath = Yii::$app->assetManager->getPublishedPath('@ycm/assets') . '/img/smiles/';
+                    $smileItems = scandir($smilePath);
+                    $smileFiles = [];
+                    $smileNames = [];
+                    foreach ($smileItems as $_item) {
+                        if ($_item == '.' || $_item == '..') {
+                            continue;
+                        }
+
+                        $smileFiles[] = $_item;
+                        $_name = preg_replace('/[._].+/', '', $_item);
+                        $smileNames[] = preg_replace('/-/', ' ', $_name);
+                    }
+                    $extraPlugins[] = 'smiley';
                 }
 
-                $extraPlugins = ['imageUploader', 'filetools', 'colorbutton', 'colordialog', 'justify', 'videoembed', 'font', 'smiley', 'iframe'];
                 $widgetButtons = [];
                 if ($this->ckeWidgets) {
                     $extraPlugins[] = 'widget';
@@ -384,9 +390,6 @@ class Module extends \yii\base\Module
                         'extraAllowedContent' => 'img[title]; div; *(*)',
                         'removeButtons' => '',
                         'height' => 500,
-                        'smiley_path' => Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/img/smiles/',
-                        'smiley_images' => $smileFiles,
-                        'smiley_descriptions' => $smileNames,
                         'uploadUrl' => Url::to([
                             'model/redactor-upload',
                             'name' => $this->getModelName($model),
@@ -404,6 +407,13 @@ class Module extends \yii\base\Module
                         'contentsCss' => $contentsCss,
                     ],
                 ];
+
+                if ($this->enableSmiles) {
+                    $options['clientOptions']['smiley_path'] = Yii::$app->assetManager->getPublishedUrl('@ycm/assets') . '/img/smiles/';
+                    $options['clientOptions']['smiley_images'] = $smileFiles;
+                    $options['clientOptions']['$smileNames'] = $smileNames;
+                }
+
                 return $this->createField($form, $model, $attribute, $options, 'widget');
 
             case 'date':
