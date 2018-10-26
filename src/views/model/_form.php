@@ -42,18 +42,18 @@ $attributes = array_filter(array_unique(array_map('trim', $attributes)));
         else:
             ?>
 
-            <? if ($module->getHideOk($model) === false): ?>
+            <?php if ($module->getHideOk($model) === false): ?>
             <?= Html::submitButton(Yii::t('ycm', 'Save'), [
                 'name' => '_save',
                 'value' => '1',
                 'class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary',
             ]) ?>
-        <? endif ?>
+        <?php endif ?>
 
-            <? if ($module->getHideCreate($model) === false): ?>
+            <?php if ($module->getHideCreate($model) === false): ?>
             <?= Html::submitButton(Yii::t('ycm', 'Save and add another'),
                 ['name' => '_addanother', 'value' => '1', 'class' => 'btn btn-default']) ?>
-        <? endif ?>
+        <?php endif ?>
 
             <?= Html::submitButton(Yii::t('ycm', 'Save and continue editing'),
             ['name' => '_continue', 'value' => '1', 'class' => 'btn btn-default']) ?>
