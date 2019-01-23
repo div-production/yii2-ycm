@@ -124,6 +124,8 @@ class TreeColumn extends Object
      */
     public $format = 'text';
 
+    public $filter = null;
+
     /**
      * Renders the header cell.
      */
