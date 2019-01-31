@@ -5,6 +5,7 @@ namespace janisto\ycm;
 use app\widgets\timetable\Widget as TimetableWidget;
 use dosamigos\ckeditor\CKEditor;
 use janisto\timepicker\TimePicker;
+use mihaildev\elfinder\ElFinder;
 use vova07\select2\Widget as Select2Widget;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -279,19 +280,13 @@ class Module extends \yii\base\Module
 
             case 'wysiwyg':
                 $assetsUrl = Yii::$app->assetManager->getPublishedUrl('@ycm/assets');
-
-                $imageUploaderUrl = $assetsUrl . '/js/cke.image-uploader.js';
-                Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('imageUploader', '$imageUploaderUrl', '');");
                 $videoEmbedUrl = $assetsUrl . '/video-embed/plugin.js';
                 Yii::$app->view->registerJs("CKEDITOR.plugins.addExternal('videoembed', '$videoEmbedUrl', '');");
-
-                $imageDialogUrl = $assetsUrl . '/js/image-dialog.js';
-                Yii::$app->view->registerJs("CKEDITOR.dialog.add('image', '$imageDialogUrl');");
 
                 $ycmAsset = new YcmAsset();
                 $ycmAsset->publish(Yii::$app->assetManager);
 
-                $extraPlugins = ['imageUploader', 'filetools', 'colorbutton', 'colordialog', 'justify', 'videoembed', 'font', 'iframe'];
+                $extraPlugins = ['filetools', 'colorbutton', 'colordialog', 'justify', 'videoembed', 'font', 'iframe'];
 
                 if ($this->enableSmiles) {
                     $smilePath = Yii::$app->assetManager->getPublishedPath('@ycm/assets') . '/img/smiles/';
@@ -337,75 +332,71 @@ class Module extends \yii\base\Module
                 $options = [
                     'widgetClass' => CKEditor::className(),
                     'preset' => 'custom',
-                    'clientOptions' => [
-                        'inline' => false,
-                        'toolbar' => [
-                            ['name' => 'document', 'items' => ['Source']],
-                            [
-                                'name' => 'clipboard',
-                                'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+                    'clientOptions' =>
+                        ElFinder::ckeditorOptions('elfinder', [
+                            'inline' => false,
+                            'toolbar' => [
+                                ['name' => 'document', 'items' => ['Source']],
+                                [
+                                    'name' => 'clipboard',
+                                    'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
+                                ],
+                                [
+                                    'name' => 'basicstyles',
+                                    'items' => [
+                                        'Bold',
+                                        'Italic',
+                                        'Underline',
+                                        'Strike',
+                                        'Subscript',
+                                        'Superscript',
+                                        'FontSize',
+                                        'Blockquote',
+                                        '-',
+                                        'RemoveFormat',
+                                    ],
+                                ],
+                                [
+                                    'name' => 'paragraph',
+                                    'items' => [
+                                        'NumberedList',
+                                        'BulletedList',
+                                        '-',
+                                        'Outdent',
+                                        'Indent',
+                                        '-',
+                                        'JustifyLeft',
+                                        'JustifyCenter',
+                                        'JustifyRight',
+                                        'JustifyBlock',
+                                    ],
+                                ],
+                                ['name' => 'links', 'items' => ['Link', 'Unlink',]],
+                                [
+                                    'name' => 'insert',
+                                    'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'VideoEmbed', 'Iframe', 'Smiley'],
+                                ],
+                                ['name' => 'styles', 'items' => ['Format']],
+                                ['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
+                                ['name' => 'tools', 'items' => ['ShowBlocks']],
+                                ['name' => 'about', 'items' => ['About']],
+                                ['Widgets'],
                             ],
-                            [
-                                'name' => 'basicstyles',
-                                'items' => [
-                                    'Bold',
-                                    'Italic',
-                                    'Underline',
-                                    'Strike',
-                                    'Subscript',
-                                    'Superscript',
-                                    'FontSize',
-                                    'Blockquote',
-                                    '-',
-                                    'RemoveFormat',
+                            'extraPlugins' => implode(',', $extraPlugins),
+                            'extraAllowedContent' => 'img[title]; div; *(*)',
+                            'removeButtons' => '',
+                            'height' => 500,
+                            'dropdownmenumanager' => [
+                                'Widgets' => [
+                                    'items' => $widgetButtons,
+                                    'label' => [
+                                        'text' => 'Виджеты',
+                                        'width' => 80,
+                                    ],
                                 ],
                             ],
-                            [
-                                'name' => 'paragraph',
-                                'items' => [
-                                    'NumberedList',
-                                    'BulletedList',
-                                    '-',
-                                    'Outdent',
-                                    'Indent',
-                                    '-',
-                                    'JustifyLeft',
-                                    'JustifyCenter',
-                                    'JustifyRight',
-                                    'JustifyBlock',
-                                ],
-                            ],
-                            ['name' => 'links', 'items' => ['Link', 'Unlink',]],
-                            [
-                                'name' => 'insert',
-                                'items' => ['Image', 'Table', 'HorizontalRule', 'SpecialChar', 'VideoEmbed', 'Iframe', 'Smiley'],
-                            ],
-                            ['name' => 'styles', 'items' => ['Format']],
-                            ['name' => 'colors', 'items' => ['TextColor', 'BGColor']],
-                            ['name' => 'tools', 'items' => ['ShowBlocks']],
-                            ['name' => 'about', 'items' => ['About']],
-                            ['Widgets'],
-                        ],
-                        'extraPlugins' => implode(',', $extraPlugins),
-                        'extraAllowedContent' => 'img[title]; div; *(*)',
-                        'removeButtons' => '',
-                        'height' => 500,
-                        'uploadUrl' => Url::to([
-                            'model/redactor-upload',
-                            'name' => $this->getModelName($model),
-                            'attr' => $attribute,
+                            'contentsCss' => $contentsCss,
                         ]),
-                        'dropdownmenumanager' => [
-                            'Widgets' => [
-                                'items' => $widgetButtons,
-                                'label' => [
-                                    'text' => 'Виджеты',
-                                    'width' => 80,
-                                ],
-                            ],
-                        ],
-                        'contentsCss' => $contentsCss,
-                    ],
                 ];
 
                 if ($this->enableSmiles) {

@@ -24,7 +24,8 @@
         "vova07/yii2-imperavi-widget": "*",
         "vova07/yii2-select2-widget": "*",
 		"yiisoft/yii2-jui": "*",
-		"2amigos/yii2-ckeditor-widget" : "*"
+		"2amigos/yii2-ckeditor-widget" : "*",
+        "mihaildev/yii2-elfinder": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5",
