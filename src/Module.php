@@ -140,6 +140,8 @@ class Module extends \yii\base\Module
 
     public $enableSmiles = false;
 
+    public $enableImageCompressing = true;
+
     protected $attributeWidgets;
 
     /**
@@ -1142,7 +1144,12 @@ class Module extends \yii\base\Module
                 @mkdir($saveDir, $this->uploadPermissions, true);
             }
 
-            if (dirname($file->type) == 'image' && $file->type != 'image/svg+xml' && $file->type != 'image/x-icon') {
+            if (
+                dirname($file->type) == 'image'
+                && $file->type != 'image/svg+xml'
+                && $file->type != 'image/x-icon'
+                && $this->enableImageCompressing
+            ) {
                 try {
                     Image::thumbnail($file->tempName, 1920, null)->save($savePath, [
                         'quality' => 70,
