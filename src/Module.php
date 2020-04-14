@@ -635,6 +635,10 @@ class Module extends \yii\base\Module
                 } else {
                     $options['items'] = $this->getAttributeChoices($model, $attribute);
                 }
+                if (!isset($options['options']['class'])) {
+                    // чтобы на элемент не вешался класс form-control
+                    $options['options']['class'] = '';
+                }
                 $field->widget(Select2Widget::className(), $options);
             } elseif ($type == 'widget') {
                 if (isset($options['widgetClass'])) {
