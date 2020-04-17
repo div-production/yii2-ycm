@@ -1,9 +1,9 @@
 <?php
 namespace janisto\ycm\widgets\MultiField;
 
-use yii\base\Object;
+use yii\base\BaseObject;
 
-class DataAttribute extends Object
+class DataAttribute extends BaseObject
 {
     public $model;
 

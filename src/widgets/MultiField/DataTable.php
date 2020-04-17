@@ -2,11 +2,11 @@
 namespace janisto\ycm\widgets\MultiField;
 
 use Yii;
-use yii\base\Object;
+use yii\base\BaseObject;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
-class DataTable extends Object
+class DataTable extends BaseObject
 {
     public $model;
 
