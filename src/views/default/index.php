@@ -17,6 +17,9 @@ $this->title = Yii::t('ycm', 'Content');
 
     <?php foreach ($module->models as $name => $class): ?>
         <?php
+        if ($module->getHideList($class)) {
+            continue;
+        }
         $download = false;
         $downloadItems = [];
         $model = $module->loadModel($name);
