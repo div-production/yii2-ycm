@@ -37,6 +37,10 @@ class Bootstrap implements BootstrapInterface
                     'class' => PhpMessageSource::className(),
                     'basePath' => __DIR__ . '/messages',
                 ];
+                $app->i18n->translations['auth'] = [
+                    'class' => PhpMessageSource::className(),
+                    'basePath' => __DIR__ . '/messages',
+                ];
             }
         }
     }

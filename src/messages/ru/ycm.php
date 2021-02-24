@@ -49,4 +49,6 @@ return [
     'You can\'t edit entries in demo mode' => 'Вы не можете редактировать записи в демо режиме',
     'You can\'t delete entries in demo mode' => 'Вы не можете удалять записи в демо режиме',
     'Entry for copy not found' => 'Запись для копирования не найдена',
+    'Add field' => 'Добавить поле',
+    'Main' => 'Основное'
 ];

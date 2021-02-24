@@ -1,6 +1,7 @@
 <?php
 namespace janisto\ycm\widgets\MultiField;
 
+use Yii;
 use yii\base\Widget as BaseWidget;
 use yii\helpers\Html;
 use yii\web\View;
@@ -58,7 +59,7 @@ class Widget extends BaseWidget
             $result = $this->createRow([]);
         }
         if ($this->showCreate) {
-            $result .= '<div class="btn btn-primary js-field-add" widget_attr=' . $this->attribute . '>Добавить поле</div>';
+            $result .= '<div class="btn btn-primary js-field-add" widget_attr=' . $this->attribute . '>' . Yii::t('ycm', 'Add field') .  '</div>';
         }
         return '<div>' . $result . '</div>';
     }
@@ -106,7 +107,7 @@ class Widget extends BaseWidget
             $r .= Html::activeInput($type, $this->model, $name, $options);
         }
         if ($this->showRemove) {
-            $r .= '<div class="btn btn-warning js-field-remove" style="position: absolute; top: 0; left: 100%;">Удалить</div>';
+            $r .= '<div class="btn btn-warning js-field-remove" style="position: absolute; top: 0; left: 100%;">' . Yii::t('ycm', 'Delete') . '</div>';
         }
         return '<div style="position: relative;">' . $r . '<br><br></div>';
     }

@@ -1085,7 +1085,7 @@ class Module extends \yii\base\Module
             $attributeTabs = $model->attributeTabs();
             $tabs = [
                 [
-                    'label' => 'Основное',
+                    'label' => Yii::t('ycm', 'Main'),
                     'content' => '<br>',
                     'active' => true,
                 ],
