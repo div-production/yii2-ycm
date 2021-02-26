@@ -144,6 +144,10 @@ class Module extends \yii\base\Module
 
     protected $attributeWidgets;
 
+    public $languages = [
+        'ru' => 'Русский'
+    ];
+
     /**
      * @inheritdoc
      */
